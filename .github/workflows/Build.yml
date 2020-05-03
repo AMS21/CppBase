@@ -21,53 +21,53 @@ jobs:
           - { os: ubuntu-latest, compiler: clang++, compiler_version: 9}
           - { os: ubuntu-latest, compiler: clang++, compiler_version: 10 }
 
-  steps:
-    - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
 
-    - name: get-cmake
-      uses: lukka/get-cmake@v3.17.1
+      - name: get-cmake
+        uses: lukka/get-cmake@v3.17.1
 
-    - name: Install (Linux)
-      if: runner.os == 'Linux'
-      run: |
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+      - name: Install (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 
-        sudo apt-get update -m
+          sudo apt-get update -m
 
-        # Install clang
-        if [ "${{ matrix.cfg.compiler }}" = "clang++" ]; then
-          wget --no-check-certificate https://apt.llvm.org/llvm.sh
-          chmod +x llvm.sh
-          sudo ./llvm.sh "${{ matrix.cfg.compiler_version }}"
-        fi
+          # Install clang
+          if [ "${{ matrix.cfg.compiler }}" = "clang++" ]; then
+            wget --no-check-certificate https://apt.llvm.org/llvm.sh
+            chmod +x llvm.sh
+            sudo ./llvm.sh "${{ matrix.cfg.compiler_version }}"
+          fi
 
-        # Install g++
-        if [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
-          sudo apt-get install "${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" -y
-        fi
+          # Install g++
+          if [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
+            sudo apt-get install "${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" -y
+          fi
 
-    - name: Configure build directory
-      run: |
-        mkdir build
-        cd build
-        cmake -DCMAKE_CXX_COMPILER="${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" ..
+      - name: Configure build directory
+        run: |
+          mkdir build
+          cd build
+          cmake -DCMAKE_CXX_COMPILER="${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" ..
 
-    - name: Build & Test Debug x64
-      run: |
-        cd build
-        # Configure cmake
-        cmake -DCMAKE_BUILD_TYPE=Debug ..
-        # Build
-        cmake --build . --clean-first
-        # Run tests
-        ctest --output-on-failure .
+      - name: Build & Test Debug x64
+        run: |
+          cd build
+          # Configure cmake
+          cmake -DCMAKE_BUILD_TYPE=Debug ..
+          # Build
+          cmake --build . --clean-first
+          # Run tests
+          ctest --output-on-failure .
 
-    - name: Build & Test Release x64
-      run: |
-        cd build
-        # Configure cmake
-        cmake -DCMAKE_BUILD_TYPE=Release ..
-        # Build
-        cmake --build . --clean-first
-        # Run tests
-        ctest --output-on-failure .
+      - name: Build & Test Release x64
+        run: |
+          cd build
+          # Configure cmake
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          # Build
+          cmake --build . --clean-first
+          # Run tests
+          ctest --output-on-failure .
