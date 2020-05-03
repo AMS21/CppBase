@@ -1,7 +1,7 @@
 name: Build
 
 on: [push, pull_request]
-    
+
 jobs:
  build:
   runs-on: ${{ matrix.cfg.os }}
@@ -27,21 +27,21 @@ jobs:
         # Required for libc6-dbg:i386 and g++-multilib packages which are
         # needed for x86 builds.
         sudo dpkg --add-architecture i386
-          
+
         sudo apt-get update
-        
+
         # Install clang
         if [ "${{ matrix.cfg.compiler }}" = "clang" ]; then
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh "${{ matrix.cfg.compiler_version }}"
         fi
-          
+
         # Install gcc
         if [ "${{ matrix.cfg.compiler }}" = "clang" ]; then
           sudo apt-get install "${{ matrix.cfg.compiler }}"-"${{ matrix.cfg.compiler_version }}" -y
         fi
-          
+
     - name: Build & Test Debug x64
       run: |
         # Create build directory
@@ -65,4 +65,3 @@ jobs:
         cmake --build . --clean-first
         # Run tests
         ctest --output-on-failure .
-        
