@@ -4,22 +4,22 @@ on: [push, pull_request]
 
 jobs:
   build:
-  runs-on: ${{ matrix.cfg.os }}
-  strategy:
-    fail-fast: false
-    matrix:
-      cfg:
-        # Ubuntu gcc
-        - { os: ubuntu-latest, compiler: g++, compiler_version: 4.8 }
-        - { os: ubuntu-latest, compiler: g++, compiler_version: 4.9 }
-        - { os: ubuntu-latest, compiler: g++, compiler_version: 5 }
-        - { os: ubuntu-latest, compiler: g++, compiler_version: 6 }
-        - { os: ubuntu-latest, compiler: g++, compiler_version: 7 }
-        - { os: ubuntu-latest, compiler: g++, compiler_version: 8 }
-        - { os: ubuntu-latest, compiler: g++, compiler_version: 9 }
-        # Ubuntu clang
-        - { os: ubuntu-latest, compiler: clang++, compiler_version: 9}
-        - { os: ubuntu-latest, compiler: clang++, compiler_version: 10 }
+    runs-on: ${{ matrix.cfg.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        cfg:
+          # Ubuntu gcc
+          - { os: ubuntu-latest, compiler: g++, compiler_version: 4.8 }
+          - { os: ubuntu-latest, compiler: g++, compiler_version: 4.9 }
+          - { os: ubuntu-latest, compiler: g++, compiler_version: 5 }
+          - { os: ubuntu-latest, compiler: g++, compiler_version: 6 }
+          - { os: ubuntu-latest, compiler: g++, compiler_version: 7 }
+          - { os: ubuntu-latest, compiler: g++, compiler_version: 8 }
+          - { os: ubuntu-latest, compiler: g++, compiler_version: 9 }
+          # Ubuntu clang
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: 9}
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: 10 }
 
   steps:
     - uses: actions/checkout@v2
