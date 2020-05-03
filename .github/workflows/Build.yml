@@ -41,13 +41,16 @@ jobs:
           sudo apt-get install "${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" -y
         fi
 
-    - name: Build & Test Debug x64
+    - name: Setup build directory
       run: |
-        # Create build directory
         mkdir build
         cd build
+        cmake -DCMAKE_CXX_COMPILER="${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" ..
+
+    - name: Build & Test Debug x64
+      run: |
         # Configure cmake
-        cmake -DCMAKE_CXX_COMPILER="${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" -DCMAKE_BUILD_TYPE=Debug ..
+        cmake -DCMAKE_BUILD_TYPE=Debug ..
         # Build
         cmake --build . --clean-first
         # Run tests
@@ -55,11 +58,8 @@ jobs:
 
     - name: Build & Test Release x64
       run: |
-        # Create build directory
-        mkdir build
-        cd build
         # Configure cmake
-        cmake -DCMAKE_CXX_COMPILER="${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" -DCMAKE_BUILD_TYPE=Release ..
+        cmake -DCMAKE_BUILD_TYPE=Release ..
         # Build
         cmake --build . --clean-first
         # Run tests
