@@ -52,7 +52,7 @@ jobs:
 
           # Install g++
           if [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
-            sudo apt-get install "g++-${{ matrix.cfg.compiler_version }}" "g++-${{ matrix.version }}-multilib" -y
+            sudo apt-get install "g++-${{ matrix.cfg.compiler_version }}" "g++-${{ matrix.cfg.compiler_version }}-multilib" -y
           fi
 
       - name: Configure build directory
