@@ -36,7 +36,7 @@ jobs:
           sudo ./llvm.sh "${{ matrix.cfg.compiler_version }}"
         fi
 
-        # Install gcc
+        # Install g++
         if [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
           sudo apt-get install "${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" -y
         fi
