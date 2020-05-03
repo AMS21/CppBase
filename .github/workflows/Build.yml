@@ -49,9 +49,9 @@ jobs:
             sudo add-apt-repository 'deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe'
           fi
 
-          # Add clang repository
-          if [ "${{ matrix.cfg.compiler }}" = "clang++" ]; then
-            sudo add-apt-repository "deb http://apt.llvm.org/bionic/ "llvm-toolchain-bionic-${{ matrix.cfg.compiler_version }}" main"
+          # Add clang repository for clang-10 and clang-9
+          if [ "${{ matrix.cfg.compiler }}" = "clang++" ] && [ "${{ matrix.cfg.compiler_version = "10" }}" ] || [ "${{ matrix.cfg.compiler_version }}" = "9" ]; then
+            sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ matrix.cfg.compiler_version }} main"
           fi
 
           # Update repo list
