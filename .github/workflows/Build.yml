@@ -10,11 +10,11 @@ jobs:
     matrix:
      cfg:
        # Ubuntu gcc
-       - { os: ubuntu-latest, compiler: gcc, compiler_version: 8 }
-       - { os: ubuntu-latest, compiler: gcc, compiler_version: 9 }
+       - { os: ubuntu-latest, compiler: g++, compiler_version: 8 }
+       - { os: ubuntu-latest, compiler: g++, compiler_version: 9 }
        # Ubuntu clang
-       - { os: ubuntu-latest, compiler: clang, compiler_version: 9}
-       - { os: ubuntu-latest, compiler: clang, compiler_version: 10 }
+       - { os: ubuntu-latest, compiler: clang++, compiler_version: 9}
+       - { os: ubuntu-latest, compiler: clang++, compiler_version: 10 }
 
   steps:
     - uses: actions/checkout@v2
@@ -30,14 +30,14 @@ jobs:
         sudo apt-get update -m
 
         # Install clang
-        if [ "${{ matrix.cfg.compiler }}" = "clang" ]; then
+        if [ "${{ matrix.cfg.compiler }}" = "clang++" ]; then
           wget --no-check-certificate https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh "${{ matrix.cfg.compiler_version }}"
         fi
 
         # Install gcc
-        if [ "${{ matrix.cfg.compiler }}" = "clang" ]; then
+        if [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
           sudo apt-get install "${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" -y
         fi
 
