@@ -6,8 +6,8 @@ jobs:
  build:
   runs-on: ${{ matrix.cfg.os }}
   strategy:
-  fail-fast: false
-   matrix:
+    fail-fast: false
+    matrix:
      cfg:
        # Ubuntu gcc
        - { os: ubuntu-latest, compiler: gcc, compiler_version: 8 }
