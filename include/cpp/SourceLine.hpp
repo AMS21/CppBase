@@ -3,8 +3,8 @@
  * \brief Exports an object like macro that expands to a C-style string
  *        of the current line number in the source code.
 **/
-#ifndef INCG_CPPBASE_SOURCELINE_HPP
-#define INCG_CPPBASE_SOURCELINE_HPP
+#ifndef INCG_CPPBASE_SOURCE_LINE_HPP
+#define INCG_CPPBASE_SOURCE_LINE_HPP
 
 #include "Stringify.hpp" // CPP_STRINGIFY
 
@@ -19,4 +19,4 @@
 **/
 #define CPP_SOURCE_LINE CPP_STRINGIFY(__LINE__)
 
-#endif // INCG_CPPBASE_SOURCELINE_HPP
+#endif // INCG_CPPBASE_SOURCE_LINE_HPP
