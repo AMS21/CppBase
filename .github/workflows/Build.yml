@@ -41,7 +41,7 @@ jobs:
           sudo apt-get install "${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" -y
         fi
 
-    - name: Setup build directory
+    - name: Configure build directory
       run: |
         mkdir build
         cd build
@@ -49,6 +49,7 @@ jobs:
 
     - name: Build & Test Debug x64
       run: |
+        cd build
         # Configure cmake
         cmake -DCMAKE_BUILD_TYPE=Debug ..
         # Build
@@ -58,6 +59,7 @@ jobs:
 
     - name: Build & Test Release x64
       run: |
+        cd build
         # Configure cmake
         cmake -DCMAKE_BUILD_TYPE=Release ..
         # Build
