@@ -17,7 +17,17 @@ jobs:
           - { os: ubuntu-latest, compiler: g++, compiler_version: 8 }
           - { os: ubuntu-latest, compiler: g++, compiler_version: 9 }
           # Ubuntu clang
-          - { os: ubuntu-latest, compiler: clang++, compiler_version: 9}
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: 3.5 }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: 3.6 }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: 3.7 }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: 3.8 }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: 3.9 }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: 4.0 }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: 5.0 }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: 6.0 }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: 7 }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: 8 }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: 9 }
           - { os: ubuntu-latest, compiler: clang++, compiler_version: 10 }
 
     steps:
