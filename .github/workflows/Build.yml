@@ -6,6 +6,7 @@ jobs:
  build:
   runs-on: ${{ matrix.cfg.os }}
   strategy:
+  fail-fast: false
    matrix:
      cfg:
        # Ubuntu gcc
@@ -24,11 +25,13 @@ jobs:
     - name: Install (Linux)
       if: runner.os == 'Linux'
       run: |
-        sudo apt-get update
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+
+        sudo apt-get update -m
 
         # Install clang
         if [ "${{ matrix.cfg.compiler }}" = "clang" ]; then
-          wget https://apt.llvm.org/llvm.sh
+          wget --no-check-certificate https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh "${{ matrix.cfg.compiler_version }}"
         fi
