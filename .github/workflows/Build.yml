@@ -10,7 +10,6 @@ jobs:
       matrix:
         cfg:
           # Ubuntu gcc
-          - { os: ubuntu-latest, compiler: g++, compiler_version: 4.8 }
           - { os: ubuntu-latest, compiler: g++, compiler_version: 4.9 }
           - { os: ubuntu-latest, compiler: g++, compiler_version: 5 }
           - { os: ubuntu-latest, compiler: g++, compiler_version: 6 }
@@ -30,8 +29,17 @@ jobs:
       - name: Install (Linux)
         if: runner.os == 'Linux'
         run: |
+          # Add required repositories
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 
+          # Ubuntu 18.04 doesnt provide g++-4.9 so we need to use the xenial package
+          # See https://askubuntu.com/a/1036152
+          if [ "${{ matrix.cfg.compiler }}" = "g++" ] && [ "${{ matrix.cfg.compiler_version = "4.9" }}" ]; then
+            sudo add-apt-repository 'deb http://dk.archive.ubuntu.com/ubuntu/ xenial main'
+            sudo add-apt-repository 'deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe'
+          fi
+
+          # Update repo list
           sudo apt-get update -m
 
           # Install clang
@@ -39,11 +47,12 @@ jobs:
             wget --no-check-certificate https://apt.llvm.org/llvm.sh
             chmod +x llvm.sh
             sudo ./llvm.sh "${{ matrix.cfg.compiler_version }}"
+            sudo apt-get install g++-multilib -y
           fi
 
           # Install g++
           if [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
-            sudo apt-get install "${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" -y
+            sudo apt-get install "g++-${{ matrix.cfg.compiler_version }}" "g++-${{ matrix.version }}-multilib" -y
           fi
 
       - name: Configure build directory
