@@ -34,7 +34,7 @@ jobs:
 
           # Ubuntu 18.04 doesnt provide g++-4.9 so we need to use the xenial package
           # See https://askubuntu.com/a/1036152
-          if [ "${{ matrix.cfg.compiler }}" = "g++" ] && [ "${{ matrix.cfg.compiler_version = "4.9" }}" ]; then
+          if [ "${{ matrix.cfg.compiler }}" = "g++" ] && [ "${{ matrix.cfg.compiler_version }}" = "4.9" ]; then
             sudo add-apt-repository 'deb http://dk.archive.ubuntu.com/ubuntu/ xenial main'
             sudo add-apt-repository 'deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe'
           fi
