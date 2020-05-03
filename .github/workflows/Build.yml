@@ -24,10 +24,6 @@ jobs:
     - name: Install (Linux)
       if: runner.os == 'Linux'
       run: |
-        # Required for libc6-dbg:i386 and g++-multilib packages which are
-        # needed for x86 builds.
-        sudo dpkg --add-architecture i386
-
         sudo apt-get update
 
         # Install clang
@@ -39,7 +35,7 @@ jobs:
 
         # Install gcc
         if [ "${{ matrix.cfg.compiler }}" = "clang" ]; then
-          sudo apt-get install "${{ matrix.cfg.compiler }}"-"${{ matrix.cfg.compiler_version }}" -y
+          sudo apt-get install "${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" -y
         fi
 
     - name: Build & Test Debug x64
