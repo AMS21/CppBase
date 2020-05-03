@@ -49,15 +49,17 @@ jobs:
             sudo add-apt-repository 'deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe'
           fi
 
+          # Add clang repository
+          if [ "${{ matrix.cfg.compiler }}" = "clang++" ]; then
+            sudo add-apt-repository "deb http://apt.llvm.org/bionic/ "llvm-toolchain-bionic-${{ matrix.cfg.compiler_version }}" main"
+          fi
+
           # Update repo list
           sudo apt-get update -m
 
           # Install clang
           if [ "${{ matrix.cfg.compiler }}" = "clang++" ]; then
-            wget --no-check-certificate https://apt.llvm.org/llvm.sh
-            chmod +x llvm.sh
-            sudo ./llvm.sh "${{ matrix.cfg.compiler_version }}"
-            sudo apt-get install g++-multilib -y
+            sudo apt-get install "clang-${{ matrix.cfg.compiler_version }}" g++-multilib -y
           fi
 
           # Install g++
