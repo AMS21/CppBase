@@ -25,7 +25,7 @@ DETAIL_CPPBASE_BEGIN_NAMESPACE
      *          of bits in Numeric - 1.
      **/
 template <typename Numeric>
-CPP_CONSTEXPR Numeric& set_bit(Numeric& numeric, Numeric bit) noexcept
+CPP_EXTENDED_CONSTEXPR Numeric& set_bit(Numeric& numeric, Numeric bit) noexcept
 {
     static_assert(std::is_unsigned<Numeric>::value,
                   "Numeric in cpp::set_bit should be an unsigned type.");
@@ -43,7 +43,7 @@ CPP_CONSTEXPR Numeric& set_bit(Numeric& numeric, Numeric bit) noexcept
      *          Numeric - 1.
      **/
 template <typename Numeric>
-CPP_CONSTEXPR Numeric& clear_bit(Numeric& numeric, Numeric bit) noexcept
+CPP_EXTENDED_CONSTEXPR Numeric& clear_bit(Numeric& numeric, Numeric bit) noexcept
 {
     static_assert(std::is_unsigned<Numeric>::value,
                   "Numeric in cpp::clear_bit should be an unsigned type.");
@@ -66,7 +66,7 @@ CPP_CONSTEXPR Numeric& clear_bit(Numeric& numeric, Numeric bit) noexcept
      * will be 1 after having executed this function.
      **/
 template <typename Numeric>
-CPP_CONSTEXPR Numeric& toggle_bit(Numeric& numeric, Numeric bit) noexcept
+CPP_EXTENDED_CONSTEXPR Numeric& toggle_bit(Numeric& numeric, Numeric bit) noexcept
 {
     static_assert(std::is_unsigned<Numeric>::value,
                   "Numeric in cpp::toggle_bit should be an unsigned type.");
