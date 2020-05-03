@@ -1,0 +1,68 @@
+name: Build
+
+on: [push, pull_request]
+    
+jobs:
+ build:
+  runs-on: ${{ matrix.cfg.os }}
+  strategy:
+   matrix:
+     cfg:
+       # Ubuntu gcc
+       - { os: ubuntu-latest, compiler: gcc, compiler_version: 8 }
+       - { os: ubuntu-latest, compiler: gcc, compiler_version: 9 }
+       # Ubuntu clang
+       - { os: ubuntu-latest, compiler: clang, compiler_version: 9}
+       - { os: ubuntu-latest, compiler: clang, compiler_version: 10 }
+
+  steps:
+    - uses: actions/checkout@v2
+
+    - name: get-cmake
+      uses: lukka/get-cmake@v3.17.1
+
+    - name: Install (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        # Required for libc6-dbg:i386 and g++-multilib packages which are
+        # needed for x86 builds.
+        sudo dpkg --add-architecture i386
+          
+        sudo apt-get update
+        
+        # Install clang
+        if [ "${{ matrix.cfg.compiler }}" = "clang" ]; then
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh "${{ matrix.cfg.compiler_version }}"
+        fi
+          
+        # Install gcc
+        if [ "${{ matrix.cfg.compiler }}" = "clang" ]; then
+          sudo apt-get install "${{ matrix.cfg.compiler }}"-"${{ matrix.cfg.compiler_version }}" -y
+        fi
+          
+    - name: Build & Test Debug x64
+      run: |
+        # Create build directory
+        mkdir build
+        cd build
+        # Configure cmake
+        cmake -DCMAKE_CXX_COMPILER="${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" -DCMAKE_BUILD_TYPE=Debug ..
+        # Build
+        cmake --build . --clean-first
+        # Run tests
+        ctest --output-on-failure .
+
+    - name: Build & Test Release x64
+      run: |
+        # Create build directory
+        mkdir build
+        cd build
+        # Configure cmake
+        cmake -DCMAKE_CXX_COMPILER="${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" -DCMAKE_BUILD_TYPE=Release ..
+        # Build
+        cmake --build . --clean-first
+        # Run tests
+        ctest --output-on-failure .
+        
