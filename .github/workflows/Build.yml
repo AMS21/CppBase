@@ -5,6 +5,12 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ${{ matrix.cfg.os }}
+
+    env:
+      CMAKE_GENERATOR: Ninja
+      CTEST_OUTPUT_ON_FAILURE: ON
+      CTEST_PARALLEL_LEVEL: 2
+
     strategy:
       fail-fast: false
       matrix:
@@ -85,7 +91,7 @@ jobs:
           # Build
           cmake --build . --clean-first
           # Run tests
-          ctest --output-on-failure .
+          ctest .
 
       - name: Build & Test Release x64
         run: |
@@ -95,4 +101,4 @@ jobs:
           # Build
           cmake --build . --clean-first
           # Run tests
-          ctest --output-on-failure .
+          ctest .
