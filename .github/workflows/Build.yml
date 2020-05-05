@@ -40,14 +40,10 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           # Add required repositories
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-
-          # Ubuntu 18.04 doesnt provide g++-4.9 so we need to use the xenial package
-          # See https://askubuntu.com/a/1036152
-          if [ "${{ matrix.cfg.compiler }}" = "g++" ] && [ "${{ matrix.cfg.compiler_version }}" = "4.9" ]; then
-            sudo add-apt-repository 'deb http://dk.archive.ubuntu.com/ubuntu/ xenial main'
-            sudo add-apt-repository 'deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe'
-          fi
+          # clang-3.8 and earlier are not available in Bionic anymore so we get
+          # them from the Xenial repositories instead. Same goes for g++-4.9
+          sudo add-apt-repository "deb http://dk.archive.ubuntu.com/ubuntu/ xenial main"
+          sudo add-apt-repository "deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe"
 
           # Add clang repository for clang-10 and clang-9
           if [ "${{ matrix.cfg.compiler }}" = "clang++" ] && [ "${{ matrix.cfg.compiler_version }}" = "10" ] || [ "${{ matrix.cfg.compiler_version }}" = "9" ]; then
