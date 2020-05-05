@@ -40,6 +40,11 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           # Add required repositories
+
+          # Required for libc6-dbg:i386 and g++-multilib packages which are
+          # needed for x86 builds.
+          sudo dpkg --add-architecture i386
+
           # clang-3.8 and earlier are not available in Bionic anymore so we get
           # them from the Xenial repositories instead. Same goes for g++-4.9
           sudo add-apt-repository "deb http://dk.archive.ubuntu.com/ubuntu/ xenial main"
@@ -52,6 +57,9 @@ jobs:
 
           # Update repo list
           sudo apt-get update -m
+
+          # libc6-dbg:i386 is required for running valgrind on x86.
+          sudo apt-get install ninja-build valgrind libc6-dbg:i386
 
           # Install clang
           if [ "${{ matrix.cfg.compiler }}" = "clang++" ]; then
