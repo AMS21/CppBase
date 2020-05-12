@@ -99,7 +99,7 @@ jobs:
           Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
           scoop install ninja --global
 
-          if ("${{ matrix.compiler }}".StartsWith("clang")) {
+          if ("${{ matrix.compiler }}".StartsWith("clang++")) {
             scoop install llvm --global
           }
           elseif ("${{ matrix.compiler }}" -eq "g++") {
