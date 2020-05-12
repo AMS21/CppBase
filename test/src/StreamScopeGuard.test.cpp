@@ -12,12 +12,6 @@
 #include <iostream>
 #include <sstream>
 
-#if __cpp_char8_t
-#    define CHAR8_T char8_t,
-#else
-#    define CHAR8_T /* Nothing */
-#endif
-
 template <typename Stream>
 void TestTemplated(Stream& stream)
 {
@@ -60,8 +54,8 @@ void TestTemplated(Stream& stream)
     }
 }
 
-TEST_CASE_TEMPLATE("SteamScopeGuard.templated", T, char, unsigned char, signed char,
-                   CHAR8_T char16_t, char32_t, wchar_t)
+template <typename T>
+void TestTemplatedTop()
 {
     // String streams
     std::basic_stringstream<T> ss;
@@ -82,6 +76,19 @@ TEST_CASE_TEMPLATE("SteamScopeGuard.templated", T, char, unsigned char, signed c
 
     std::basic_ofstream<T> fs2("file");
     TestTemplated(fs2);
+}
+
+TEST_CASE("SteamScopeGuard.templated")
+{
+    TestTemplatedTop<char>();
+    TestTemplatedTop<unsigned char>();
+    TestTemplatedTop<signed char>();
+#if __cpp_char8_t
+    TestTemplatedTop<char8_t>();
+#endif
+    TestTemplatedTop<char16_t>();
+    TestTemplatedTop<char32_t>();
+    TestTemplatedTop<wchar_t>();
 }
 
 TEST_CASE("StreamScopeGuard.streams")
