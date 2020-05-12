@@ -18,8 +18,7 @@
 
 // Apparently Microsoft forgot to define a symbol for codecvt.
 // Works with /MT only
-#if (((_MSC_VER >= 1900 /* VS 2015*/) && (_MSC_VER <= 1911 /* VS 2017 */)) ||                      \
-     (CPP_COMPILER_IS(CPP_COMPILER_CLANG) && CPP_OS_IS(CPP_OS_WINDOWS)))
+#if (!_DLL) && (_MSC_VER >= 1900 /* VS 2015*/) && (_MSC_VER <= 1911 /* VS 2017 */)
 #    include <locale>
 
 std::locale::id std::codecvt<char16_t, char, _Mbstatet>::id;
@@ -99,7 +98,10 @@ TEST_CASE("SteamScopeGuard.templated")
 #if __cpp_char8_t
     TestTemplatedTop<char8_t>();
 #endif
+    // Workaround for clang on Windows
+#if !(CPP_COMPILER_IS(CPP_COMPILER_CLANG) && CPP_OS_IS(CPP_OS_WINDOWS))
     TestTemplatedTop<char16_t>();
+#endif
     TestTemplatedTop<char32_t>();
     TestTemplatedTop<wchar_t>();
 }
