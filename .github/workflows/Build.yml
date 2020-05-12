@@ -36,9 +36,16 @@ jobs:
           - { os: ubuntu-latest, compiler: clang++, compiler_version: "8" }
           - { os: ubuntu-latest, compiler: clang++, compiler_version: "9" }
           - { os: ubuntu-latest, compiler: clang++, compiler_version: "10" }
-          # Windows
+          # Windows 2016
           - { os: windows-2016, compiler: cl }
+          - { os: windows-2016, compiler: g++ }
+          - { os: windows-2016, compiler: clang++ }
+          - { os: windows-2016, compiler: clang-cl }
+          # Windows 2019
           - { os: windows-2019, compiler: cl }
+          - { os: windows-2019, compiler: g++ }
+          - { os: windows-2019, compiler: clang++ }
+          - { os: windows-2019, compiler: clang-cl }
 
     steps:
       - uses: actions/checkout@v2
@@ -92,6 +99,13 @@ jobs:
           Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
           scoop install ninja --global
 
+          if ("${{ matrix.compiler }}".StartsWith("clang")) {
+            scoop install llvm --global
+          }
+          elseif ("${{ matrix.compiler }}" -eq "g++") {
+            scoop install gcc --global
+          }
+
           echo "::set-env name=CXX::${{ matrix.cfg.compiler }}"
 
           # Scoop modifies the PATH so we make the modified PATH global.
@@ -101,7 +115,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DCMAKE_CXX_COMPILER="$CXX" ..
+          cmake ..
 
       - name: Build & Test Debug x64
         run: |
