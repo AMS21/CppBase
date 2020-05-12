@@ -111,6 +111,10 @@ jobs:
           # Scoop modifies the PATH so we make the modified PATH global.
           echo "::set-env name=PATH::$env:PATH"
 
+      - name: Add msbuild to PATH
+        if: runner.os == 'Windows' && matrix.cfg.compiler == 'cl'
+        uses: microsoft/setup-msbuild@v1.0.0
+
       - name: Configure build directory
         run: |
           mkdir build
