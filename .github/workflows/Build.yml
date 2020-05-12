@@ -97,13 +97,18 @@ jobs:
         run: |
           # Install scoop
           Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+          # Install ninja
           scoop install ninja --global
 
-          if ("${{ matrix.compiler }}".StartsWith("clang++")) {
+          # Install required compilers
+          if ("${{ matrix.cfg.compiler }}".StartsWith("clang++")) {
             scoop install llvm --global
           }
-          elseif ("${{ matrix.compiler }}" -eq "g++") {
+          elseif ("${{ matrix.cfg.compiler }}" -eq "g++") {
             scoop install gcc --global
+          }
+          else {
+            choco install vswhere
           }
 
           echo "::set-env name=CXX::${{ matrix.cfg.compiler }}"
