@@ -12,6 +12,18 @@
 #include <iostream>
 #include <sstream>
 
+// Workaround for MSVC-STL bug in versions prior to 2019/19.20
+// See https://stackoverflow.com/questions/32055357/visual-studio-c-2015-stdcodecvt-with-char16-t-or-char32-t
+#if CPP_COMPILER_IS_BELOW(CPP_COMPILER_MSVC, 19, 20, 0)
+// Apparently Microsoft forgot to define a symbol for codecvt.
+// Works with /MT only
+#    include <locale>
+
+#    if (!_DLL) && (_MSC_VER >= 1900 /* VS 2015*/) && (_MSC_VER <= 1911 /* VS 2017 */)
+std::locale::id std::codecvt<char16_t, char, _Mbstatet>::id;
+#    endif
+#endif
+
 template <typename Stream>
 void TestTemplated(Stream& stream)
 {
