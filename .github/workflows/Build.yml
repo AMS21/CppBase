@@ -51,7 +51,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: get-cmake
-        uses: lukka/get-cmake@v3.17.1
+        uses: lukka/get-cmake@latest
 
       - name: Install (Linux)
         if: runner.os == 'Linux'
@@ -101,17 +101,19 @@ jobs:
           scoop install ninja --global
 
           # Install required compilers
-          if ("${{ matrix.cfg.compiler }}".StartsWith("clang++")) {
+          if ("${{ matrix.cfg.compiler }}".StartsWith("clang")) {
+            # Clang
             scoop install llvm --global
+            echo "::set-env name=CXX::C:\ProgramData\scoop\shims\${{ matrix.cfg.compiler }}"
           }
           elseif ("${{ matrix.cfg.compiler }}" -eq "g++") {
+            # GCC
             scoop install gcc --global
           }
           else {
-            choco install vswhere
+            # MSVC
+            scoop install vswhere
           }
-
-          echo "::set-env name=CXX::${{ matrix.cfg.compiler }}"
 
           # Scoop modifies the PATH so we make the modified PATH global.
           echo "::set-env name=PATH::$env:PATH"
