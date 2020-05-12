@@ -112,6 +112,7 @@ jobs:
           }
           else {
             # MSVC
+            scoop bucket add extras
             scoop install vswhere
           }
 
