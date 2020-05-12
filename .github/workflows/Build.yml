@@ -36,6 +36,9 @@ jobs:
           - { os: ubuntu-latest, compiler: clang++, compiler_version: "8" }
           - { os: ubuntu-latest, compiler: clang++, compiler_version: "9" }
           - { os: ubuntu-latest, compiler: clang++, compiler_version: "10" }
+          # Windows
+          - { os: windows-2016, compiler: cl }
+          - { os: windows-2019, compiler: cl }
 
     steps:
       - uses: actions/checkout@v2
@@ -78,11 +81,27 @@ jobs:
             sudo apt-get install "g++-${{ matrix.cfg.compiler_version }}" "g++-${{ matrix.cfg.compiler_version }}-multilib" -y
           fi
 
+          # export compiler
+          echo "::set-env name=CXX_COMPILER::${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}"
+
+      - name: Install (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          # Install scoop
+          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+          scoop install ninja --global
+
+          echo "::set-env name=CXX_COMPILER::${{ matrix.cfg.compiler }}"
+
+          # Scoop modifies the PATH so we make the modified PATH global.
+          echo "::set-env name=PATH::$env:PATH"
+
       - name: Configure build directory
         run: |
           mkdir build
           cd build
-          cmake -DCMAKE_CXX_COMPILER="${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}" ..
+          cmake -DCMAKE_CXX_COMPILER="$CXX_COMPILER" ..
 
       - name: Build & Test Debug x64
         run: |
