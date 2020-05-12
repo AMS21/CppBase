@@ -18,7 +18,7 @@
 
 // Apparently Microsoft forgot to define a symbol for codecvt.
 // Works with /MT only
-#if (!_DLL) && (_MSC_VER >= 1900 /* VS 2015*/) && (_MSC_VER <= 1911 /* VS 2017 */)
+#if (_MSC_VER >= 1900 /* VS 2015*/) && (_MSC_VER <= 1911 /* VS 2017 */)
 #    include <locale>
 
 std::locale::id std::codecvt<char16_t, char, _Mbstatet>::id;
