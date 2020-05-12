@@ -113,11 +113,22 @@ jobs:
           else {
             # MSVC
             scoop bucket add extras
-            scoop install vswhere
+            #scoop install vswhere
           }
 
           # Scoop modifies the PATH so we make the modified PATH global.
           echo "::set-env name=PATH::$env:PATH"
+
+          $command = "for /f "usebackq delims=*" %%i in (`C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere -latest -property installationPath`) do ( `
+                        call "%%i"\Common7\Tools\vsdevcmd.bat %* `
+                      ) `
+                      setlocal `
+                      for /f "delims== tokens=1,2" %%a in ('set') do ( `
+                        echo ::set-env name=%%a::%%b `
+                      ) `
+                      endlocal"
+
+          Start-Process "cmd.exe"  "/c $command"
 
       - name: Add msbuild to PATH
         if: runner.os == 'Windows' && matrix.cfg.compiler == 'cl'
