@@ -130,10 +130,6 @@ jobs:
 
           Start-Process "cmd.exe"  "/c $command"
 
-      - name: Add msbuild to PATH
-        if: runner.os == 'Windows' && matrix.cfg.compiler == 'cl'
-        uses: microsoft/setup-msbuild@v1.0.0
-
       - name: Configure build directory
         run: |
           mkdir build
