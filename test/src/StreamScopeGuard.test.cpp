@@ -1,6 +1,7 @@
 #include <doctest.h>
 
 #include <cpp/Compiler.hpp>
+#include <cpp/OS.hpp>
 // Not my fault MSVC is using codecvt inside fstreams...
 #if CPP_COMPILER_IS(CPP_COMPILER_MSVC)
 #    define _SILENCE_CXX20_CODECVT_FACETS_DEPRECATION_WARNING
@@ -17,9 +18,8 @@
 
 // Apparently Microsoft forgot to define a symbol for codecvt.
 // Works with /MT only
-
-#if (!_DLL) && ((_MSC_VER >= 1900 /* VS 2015*/) && (_MSC_VER <= 1911 /* VS 2017 */)) ||            \
-        (CPP_COMPILER_IS(CPP_COMPILER_CLANG) && CPP_OS_IS(CPP_OS_WINDOWS))
+#if (((_MSC_VER >= 1900 /* VS 2015*/) && (_MSC_VER <= 1911 /* VS 2017 */)) ||                      \
+     (CPP_COMPILER_IS(CPP_COMPILER_CLANG) && CPP_OS_IS(CPP_OS_WINDOWS)))
 #    include <locale>
 
 std::locale::id std::codecvt<char16_t, char, _Mbstatet>::id;
