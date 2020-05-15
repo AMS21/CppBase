@@ -325,6 +325,8 @@ jobs:
       - name: Test without RTTI x64
         if: runner.os == 'Linux' || runner.os == 'macOS'
         run: |
+          cd build
+
           # Debug
           cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-fno-rtti" ..
           cmake --build . --clean-first
@@ -338,6 +340,8 @@ jobs:
       - name: Test without exceptions x64
         if: runner.os == 'Linux' || runner.os == 'macOS'
         run: |
+          cd build
+
           # Debug
           cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-fno-exceptions" ..
           cmake --build . --clean-first
