@@ -185,6 +185,7 @@ jobs:
 
       # Memory tests
       - name: Test With Valgrind x64
+        if: runner.os == 'Linux'
         run: |
           cd build
 
