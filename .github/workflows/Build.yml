@@ -10,6 +10,7 @@ jobs:
       CMAKE_GENERATOR: Ninja
       CTEST_OUTPUT_ON_FAILURE: ON
       CTEST_PARALLEL_LEVEL: 2
+      ASAN_OPTIONS: strict_string_checks=true:detect_odr_violation=2:detect_stack_use_after_return=true:check_initialization_order=true:strict_init_order=true
 
     strategy:
       fail-fast: false
@@ -63,6 +64,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      # Installs
       - name: get-cmake
         uses: lukka/get-cmake@latest
 
@@ -200,3 +202,58 @@ jobs:
           cmake --build . --clean-first
           ctest -T memcheck
           cat ./Testing/Temporary/MemoryChecker.*.log
+
+      - name: Test with Address and Undefinedsanitizer x64
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        run: |
+          # Setup
+          # https://stackoverflow.com/a/37939589/11900641
+          function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+          # Disable sanitizers in configurations where we know they are buggy.
+          # TODO: Move these conditions to the if clause if Github Actions ever
+          # adds support for comparing versions.
+          # See: https://github.community/t5/GitHub-Actions/Allow-comparing-versions-in-if-conditions/m-p/33912#M1710
+
+          if [ "${{ runner.os }}" = "Linux" ] && \
+             [ "${{ matrix.cfg.compiler }}" = "g++" ] && \
+             [ $(version ${{ matrix.cfg.compiler_version }}) -le $(version "5.0") ]; then
+            exit 0
+          fi
+
+          if [ "${{ runner.os }}" = "Linux" ] && \
+             [ "${{ matrix.cfg.compiler }}" = "clang++" ] && \
+             [ $(version ${{ matrix.cfg.compiler_version }}) -le $(version "6.0") ]; then
+            exit 0
+          fi
+
+          if [ "${{ runner.os }}" = "macOS" ] && \
+             [ "${{ matrix.cfg.compiler }}" = "xcode" ] && \
+             [ $(version ${{ matrix.cfg.compiler_version }}) -le $(version "9.4.1") ]; then
+            exit 0
+          fi
+
+          if [ "${{ runner.os }}" = "macOS" ] && \
+             [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
+            exit 0
+          fi
+
+          ASAN_UBSAN_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer"
+          # Link statically against ASAN libraries because dynamically linking
+          # against ASAN libraries causes problems when using dlopen on Ubuntu.
+          if [ "${{ runner.os }}" = "Linux" ] && [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
+            ASAN_UBSAN_FLAGS="$ASAN_UBSAN_FLAGS -static-libasan"
+          fi
+
+          # Build and test
+          cd build
+
+          # Debug
+          cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="$ASAN_UBSAN_FLAGS" ..
+          cmake --build . --clean-first
+          ctest .
+
+          # Release
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="$ASAN_UBSAN_FLAGS" ..
+          cmake --build . --clean-first
+          ctest .
