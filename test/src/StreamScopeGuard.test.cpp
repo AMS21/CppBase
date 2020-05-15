@@ -82,8 +82,8 @@ void TestTemplatedTop()
 TEST_CASE("SteamScopeGuard.templated")
 {
     TestTemplatedTop<char>();
-    TestTemplatedTop<unsigned char>();
-    TestTemplatedTop<signed char>();
+    //TestTemplatedTop<unsigned char>();
+    //TestTemplatedTop<signed char>();
 }
 
 TEST_CASE("StreamScopeGuard.streams")
