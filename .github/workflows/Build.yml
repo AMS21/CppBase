@@ -317,7 +317,7 @@ jobs:
           cmake --build . --clean-first
           ctest .
 
-        - name: Test with Leaksanitizer x64
+      - name: Test with Leaksanitizer x64
         if: runner.os == 'Linux' || runner.os == 'macOS'
         run: |
           LSAN_FLAGS="-fsanitize=leak"
