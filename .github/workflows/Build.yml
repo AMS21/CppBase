@@ -321,3 +321,29 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="$MSAN_FLAGS" ..
           cmake --build . --clean-first
           ctest .
+
+      - name: Test without RTTI x64
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        run: |
+          # Debug
+          cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-fno-rtti" ..
+          cmake --build . --clean-first
+          ctest .
+
+          # Release
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-fno-rtti" ..
+          cmake --build . --clean-first
+          ctest .
+
+      - name: Test without exceptions x64
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        run: |
+          # Debug
+          cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-fno-exceptions" ..
+          cmake --build . --clean-first
+          ctest .
+
+          # Release
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-fno-exceptions" ..
+          cmake --build . --clean-first
+          ctest .
