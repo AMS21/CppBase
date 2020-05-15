@@ -61,11 +61,6 @@ target_include_directories(${PROJECT_NAME} INTERFACE
     "$<INSTALL_INTERFACE:include>" # <prefix>/include
     )
 
-# Silcense warnings for clang on Windows
-if (WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    target_compile_definitions(${PROJECT_NAME} INTERFACE _SILENCE_CLANG_CONCEPTS_MESSAGE)
-endif()
-
 if (CPPBASE_MASTER_PROJECT)
     # Hack for IDE's like MSVC see https://stackoverflow.com/a/29214327
     add_custom_target(${PROJECT_NAME}_ide SOURCES ${CPPBASE_HEADERS})

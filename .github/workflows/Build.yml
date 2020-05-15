@@ -43,7 +43,7 @@ jobs:
           # Windows 2019
           - { os: windows-2019, compiler: cl }
           - { os: windows-2019, compiler: g++ }
-          - { os: windows-2019, compiler: clang++ }
+          #- { os: windows-2019, compiler: clang++ }
 
     steps:
       - uses: actions/checkout@v2
