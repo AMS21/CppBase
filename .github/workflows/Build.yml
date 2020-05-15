@@ -109,11 +109,11 @@ jobs:
         run: |
           brew install cmake ninja
           if [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
-            brew install gcc@${{ matrix.cfg.version }}
-            echo "::set-env name=CXX::g++-${{ matrix.version }}"
+            brew install gcc@${{ matrix.cfg.compiler_version }}
+            echo "::set-env name=CXX::g++-${{ matrix.compiler_version }}"
           else
             ls -ls /Applications/
-            sudo xcode-select -switch /Applications/Xcode_${{ matrix.cfg.version }}.app
+            sudo xcode-select -switch /Applications/Xcode_${{ matrix.cfg.compiler_version }}.app
             echo "::set-env name=CXX::clang++"
           fi
 
