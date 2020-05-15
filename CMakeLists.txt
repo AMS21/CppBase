@@ -63,7 +63,7 @@ target_include_directories(${PROJECT_NAME} INTERFACE
 
 # Silcense warnings for clang on Windows
 if (WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC _SILENCE_CLANG_CONCEPTS_MESSAGE)
+    target_compile_definitions(${PROJECT_NAME} INTERFACE _SILENCE_CLANG_CONCEPTS_MESSAGE)
 endif()
 
 if (CPPBASE_MASTER_PROJECT)
