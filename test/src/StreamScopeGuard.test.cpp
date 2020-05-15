@@ -1,14 +1,12 @@
 #include <doctest.h>
 
 #include <cpp/Compiler.hpp>
-#include <cpp/OS.hpp>
 // Not my fault MSVC is using codecvt inside fstreams...
 #if CPP_COMPILER_IS(CPP_COMPILER_MSVC)
 #    define _SILENCE_CXX20_CODECVT_FACETS_DEPRECATION_WARNING
 #endif
 
 #include <cpp/StreamScopeGuard.hpp>
-#include <cpp/Version.hpp>
 #include <fstream>
 #include <iostream>
 #include <sstream>
