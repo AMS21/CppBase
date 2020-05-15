@@ -42,15 +42,15 @@ jobs:
           - { os: macos-latest, compiler: g++, compiler_version: 6 }
           - { os: macos-latest, compiler: g++, compiler_version: 7 }
           - { os: macos-latest, compiler: g++, compiler_version: 8 }
-          # MacOS AppleClang
-          - { os: macos-latest, compiler: clang, compiler_version: 10.3 }
-          - { os: macos-latest, compiler: clang, compiler_version: 11 }
-          - { os: macos-latest, compiler: clang, compiler_version: 11.1 }
-          - { os: macos-latest, compiler: clang, compiler_version: 11.2 }
-          - { os: macos-latest, compiler: clang, compiler_version: 11.2.1 }
-          - { os: macos-latest, compiler: clang, compiler_version: 11.3 }
-          - { os: macos-latest, compiler: clang, compiler_version: 11.4 }
-          - { os: macos-latest, compiler: clang, compiler_version: 11.4.1 }
+          # MacOS XCode
+          - { os: macos-latest, compiler: Xcode, compiler_version: 10.3 }
+          - { os: macos-latest, compiler: Xcode, compiler_version: 11 }
+          - { os: macos-latest, compiler: Xcode, compiler_version: 11.1 }
+          - { os: macos-latest, compiler: Xcode, compiler_version: 11.2 }
+          - { os: macos-latest, compiler: Xcode, compiler_version: 11.2.1 }
+          - { os: macos-latest, compiler: Xcode, compiler_version: 11.3 }
+          - { os: macos-latest, compiler: Xcode, compiler_version: 11.4 }
+          - { os: macos-latest, compiler: Xcode, compiler_version: 11.4.1 }
           # Windows 2016
           - { os: windows-2016, compiler: cl }
           - { os: windows-2016, compiler: g++ }
