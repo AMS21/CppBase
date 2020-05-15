@@ -203,7 +203,7 @@ jobs:
           ctest -T memcheck
           cat ./Testing/Temporary/MemoryChecker.*.log
 
-      - name: Test with Address and Undefinedsanitizer x64
+      - name: Test with Address, Undefined and Leaksanitizer x64
         if: runner.os == 'Linux' || runner.os == 'macOS'
         run: |
           # Setup
@@ -238,7 +238,7 @@ jobs:
             exit 0
           fi
 
-          ASAN_UBSAN_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer"
+          ASAN_UBSAN_FLAGS="-fsanitize=address,undefined,leak -fno-omit-frame-pointer"
           # Link statically against ASAN libraries because dynamically linking
           # against ASAN libraries causes problems when using dlopen on Ubuntu.
           if [ "${{ runner.os }}" = "Linux" ] && [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
