@@ -257,3 +257,44 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="$ASAN_UBSAN_FLAGS" ..
           cmake --build . --clean-first
           ctest .
+
+      - name: Test with Threadsanitizer x64
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        run: |
+          # https://stackoverflow.com/a/37939589/11900641
+          function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+          if [ "${{ runner.os }}" = "Linux" ] && \
+             [ "${{ matrix.cfg.compiler }}" = "g++" ] && \
+             [ $(version ${{ matrix.cfg.compiler_version }}) -le $(version "6.0") ]; then
+            exit 0
+          fi
+
+          if [ "${{ runner.os }}" = "Linux" ] && \
+             [ "${{ matrix.cfg.compiler }}" = "clang++" ] && \
+             [ $(version ${{ matrix.cfg.compiler_version }}) -le $(version "3.9") ]; then
+            exit 0
+          fi
+
+          if [ "${{ runner.os }}" = "macOS" ] && \
+             [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
+            exit 0
+          fi
+
+          TSAN_FLAGS="-fsanitize=thread -pie -fPIE"
+          if [ "${{ runner.os }}" = "Linux" ] && [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
+            TSAN_FLAGS="$TSAN_FLAGS -static-libtsan"
+          fi
+
+          # Build and test
+          cd build
+
+          # Debug
+          cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="$TSAN_FLAGS" ..
+          cmake --build . --clean-first
+          ctest .
+
+          # Release
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="$TSAN_FLAGS" ..
+          cmake --build . --clean-first
+          ctest .
