@@ -302,7 +302,7 @@ jobs:
       - name: Test with Memorysanitizer x64
         if: runner.os == 'Linux' || runner.os == 'macOS'
         run: |
-          if [ "${{ matrix.cfg.compiler }}" = "g++" ];
+          if [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
             exit 0
           fi
 
