@@ -300,7 +300,7 @@ jobs:
           ctest .
 
       - name: Test with Memorysanitizer x64
-        if: runner.os == 'Linux'
+        if: runner.os == 'Disabled'
         run: |
           if [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
             exit 0
@@ -318,23 +318,5 @@ jobs:
 
           # Release
           cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="$MSAN_FLAGS" ..
-          cmake --build . --clean-first
-          ctest .
-
-      - name: Test with Leaksanitizer x64
-        if: runner.os == 'Linux' || runner.os == 'macOS'
-        run: |
-          LSAN_FLAGS="-fsanitize=leak"
-
-          # Build and test
-          cd build
-
-          # Debug
-          cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="$LSAN_FLAGS" ..
-          cmake --build . --clean-first
-          ctest .
-
-          # Release
-          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="$LSAN_FLAGS" ..
           cmake --build . --clean-first
           ctest .
