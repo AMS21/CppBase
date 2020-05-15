@@ -6,7 +6,7 @@
 #define INCG_CPPBASE_ASSUME_HPP
 
 #include "Compiler.hpp"
-#include "FunctionlikeMacro.hpp"
+#include "FunctionLikeMacro.hpp"
 
 #if CPP_COMPILER_IS(CPP_COMPILER_MSVC)
 #    define CPP_ASSUME(condition) __assume(condition)

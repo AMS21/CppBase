@@ -1,0 +1,358 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.cfg.os }}
+
+    env:
+      CMAKE_GENERATOR: Ninja
+      CTEST_OUTPUT_ON_FAILURE: ON
+      CTEST_PARALLEL_LEVEL: 2
+      ASAN_OPTIONS: strict_string_checks=true:detect_odr_violation=2:detect_stack_use_after_return=true:check_initialization_order=true:strict_init_order=true
+      TSAN_OPTIONS: force_seq_cst_atomics=1
+
+    strategy:
+      fail-fast: false
+      matrix:
+        cfg:
+          # Ubuntu gcc
+          - { os: ubuntu-latest, compiler: g++, compiler_version: "4.9" }
+          - { os: ubuntu-latest, compiler: g++, compiler_version: "5" }
+          - { os: ubuntu-latest, compiler: g++, compiler_version: "6" }
+          - { os: ubuntu-latest, compiler: g++, compiler_version: "7" }
+          - { os: ubuntu-latest, compiler: g++, compiler_version: "8" }
+          - { os: ubuntu-latest, compiler: g++, compiler_version: "9" }
+          - { os: ubuntu-latest, compiler: g++, compiler_version: "10" }
+          # Ubuntu clang
+          #- { os: ubuntu-latest, compiler: clang++, compiler_version: "3.5" }
+          #- { os: ubuntu-latest, compiler: clang++, compiler_version: "3.6" }
+          #- { os: ubuntu-latest, compiler: clang++, compiler_version: "3.7" }
+          #- { os: ubuntu-latest, compiler: clang++, compiler_version: "3.8" }
+          #- { os: ubuntu-latest, compiler: clang++, compiler_version: "3.9" }
+          #- { os: ubuntu-latest, compiler: clang++, compiler_version: "4.0" }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: "5.0" }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: "6.0" }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: "7" }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: "8" }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: "9" }
+          - { os: ubuntu-latest, compiler: clang++, compiler_version: "10" }
+          # MacOS GCC
+          - { os: macos-latest, compiler: g++, compiler_version: 4.9 }
+          - { os: macos-latest, compiler: g++, compiler_version: 5 }
+          - { os: macos-latest, compiler: g++, compiler_version: 6 }
+          - { os: macos-latest, compiler: g++, compiler_version: 7 }
+          - { os: macos-latest, compiler: g++, compiler_version: 8 }
+          # MacOS XCode
+          - { os: macos-latest, compiler: Xcode, compiler_version: 10.3 }
+          - { os: macos-latest, compiler: Xcode, compiler_version: 11 }
+          - { os: macos-latest, compiler: Xcode, compiler_version: 11.1 }
+          - { os: macos-latest, compiler: Xcode, compiler_version: 11.2 }
+          - { os: macos-latest, compiler: Xcode, compiler_version: 11.2.1 }
+          - { os: macos-latest, compiler: Xcode, compiler_version: 11.3 }
+          - { os: macos-latest, compiler: Xcode, compiler_version: 11.4 }
+          - { os: macos-latest, compiler: Xcode, compiler_version: 11.4.1 }
+          # Windows 2016
+          - { os: windows-2016, compiler: cl }
+          - { os: windows-2016, compiler: g++ }
+          - { os: windows-2016, compiler: clang++ }
+          # Windows 2019
+          - { os: windows-2019, compiler: cl }
+          - { os: windows-2019, compiler: g++ }
+          #- { os: windows-2019, compiler: clang++ }
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # Installs
+      - name: get-cmake
+        uses: lukka/get-cmake@latest
+
+      - name: Install (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          # Add required repositories
+
+          # Required for libc6-dbg:i386 and g++-multilib packages which are
+          # needed for x86 builds.
+          sudo dpkg --add-architecture i386
+
+          # clang-3.8 and earlier are not available in Bionic anymore so we get
+          # them from the Xenial repositories instead. Same goes for g++-4.9
+          sudo add-apt-repository "deb http://dk.archive.ubuntu.com/ubuntu/ xenial main"
+          sudo add-apt-repository "deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe"
+
+          # Add clang repository for clang-10 and clang-9
+          if [ "${{ matrix.cfg.compiler }}" = "clang++" ] && [ "${{ matrix.cfg.compiler_version }}" = "10" ] || [ "${{ matrix.cfg.compiler_version }}" = "9" ]; then
+            sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ matrix.cfg.compiler_version }} main"
+          fi
+
+          # Update repo list
+          sudo apt-get update -m
+
+          # libc6-dbg:i386 is required for running valgrind on x86.
+          sudo apt-get install ninja-build valgrind libc6-dbg:i386
+
+          # Install clang
+          if [ "${{ matrix.cfg.compiler }}" = "clang++" ]; then
+            sudo apt-get install "clang-${{ matrix.cfg.compiler_version }}" g++-multilib -y
+          fi
+
+          # Install g++
+          if [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
+            sudo apt-get install "g++-${{ matrix.cfg.compiler_version }}" "g++-${{ matrix.cfg.compiler_version }}-multilib" -y
+          fi
+
+          # export compiler
+          echo "::set-env name=CXX::${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}"
+
+      - name: Install (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install cmake ninja
+          if [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
+            brew install gcc@${{ matrix.cfg.compiler_version }}
+            echo "::set-env name=CXX::g++-${{ matrix.cfg.compiler_version }}"
+          else
+            ls -ls /Applications/
+            sudo xcode-select -switch /Applications/Xcode_${{ matrix.cfg.compiler_version }}.app
+            echo "::set-env name=CXX::clang++"
+          fi
+
+      - name: Install (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          # Install scoop
+          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+          # Install ninja
+          scoop install ninja --global
+
+          # Install required compilers
+          if ("${{ matrix.cfg.compiler }}".StartsWith("clang")) {
+            # Clang
+            scoop install llvm --global
+            echo "::set-env name=CXX::C:\ProgramData\scoop\shims\${{ matrix.cfg.compiler }}"
+          }
+          elseif ("${{ matrix.cfg.compiler }}" -eq "g++") {
+            # GCC
+            scoop install gcc --global
+          }
+          else {
+            # MSVC
+            scoop bucket add extras
+            #scoop install vswhere
+          }
+
+          # Scoop modifies the PATH so we make the modified PATH global.
+          echo "::set-env name=PATH::$env:PATH"
+
+          $command = "for /f `"usebackq delims=*`" %%i in (`C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere -latest -property installationPath`) do ( `
+                        call `%%i`\Common7\Tools\vsdevcmd.bat %* `
+                      ) `
+                      setlocal `
+                      for /f `delims== tokens=1,2` %%a in ('set') do ( `
+                        echo ::set-env name=%%a::%%b `
+                      ) `
+                      endlocal"
+
+          Start-Process "cmd.exe"  "/c $command"
+
+      - name: Configure build directory
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+
+      # Normal builds
+      - name: Build & Test Debug x64
+        run: |
+          cd build
+          # Configure cmake
+          cmake -DCMAKE_BUILD_TYPE=Debug ..
+          # Build
+          cmake --build . --clean-first
+          # Run tests
+          ctest .
+
+      - name: Build & Test Release x64
+        run: |
+          cd build
+          # Configure cmake
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          # Build
+          cmake --build . --clean-first
+          # Run tests
+          ctest .
+
+      # Memory tests
+      - name: Test With Valgrind x64
+        if: runner.os == 'Linux'
+        run: |
+          cd build
+
+          # Debug build
+          cmake -DCMAKE_BUILD_TYPE=Debug ..
+          cmake --build . --clean-first
+          ctest -T memcheck
+          cat ./Testing/Temporary/MemoryChecker.*.log
+
+          # Release build
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . --clean-first
+          ctest -T memcheck
+          cat ./Testing/Temporary/MemoryChecker.*.log
+
+      - name: Test with Address, Undefined and Leaksanitizer x64
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        run: |
+          # Setup
+          # https://stackoverflow.com/a/37939589/11900641
+          function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+          # Disable sanitizers in configurations where we know they are buggy.
+          # TODO: Move these conditions to the if clause if Github Actions ever
+          # adds support for comparing versions.
+          # See: https://github.community/t5/GitHub-Actions/Allow-comparing-versions-in-if-conditions/m-p/33912#M1710
+
+          if [ "${{ runner.os }}" = "Linux" ] && \
+             [ "${{ matrix.cfg.compiler }}" = "g++" ] && \
+             [ $(version ${{ matrix.cfg.compiler_version }}) -le $(version "5.0") ]; then
+            exit 0
+          fi
+
+          if [ "${{ runner.os }}" = "Linux" ] && \
+             [ "${{ matrix.cfg.compiler }}" = "clang++" ] && \
+             [ $(version ${{ matrix.cfg.compiler_version }}) -le $(version "6.0") ]; then
+            exit 0
+          fi
+
+          if [ "${{ runner.os }}" = "macOS" ] && \
+             [ "${{ matrix.cfg.compiler }}" = "xcode" ] && \
+             [ $(version ${{ matrix.cfg.compiler_version }}) -le $(version "9.4.1") ]; then
+            exit 0
+          fi
+
+          if [ "${{ runner.os }}" = "macOS" ] && \
+             [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
+            exit 0
+          fi
+
+          ASAN_UBSAN_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer"
+          # Link statically against ASAN libraries because dynamically linking
+          # against ASAN libraries causes problems when using dlopen on Ubuntu.
+          if [ "${{ runner.os }}" = "Linux" ] && [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
+            ASAN_UBSAN_FLAGS="$ASAN_UBSAN_FLAGS -static-libasan"
+          fi
+
+          # Enable leak sanitizer on linux builds
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            ASAN_OPTIONS=$ASAN_OPTIONS:detect_leaks=1
+          fi
+
+          # Build and test
+          cd build
+
+          # Debug
+          cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="$ASAN_UBSAN_FLAGS" ..
+          cmake --build . --clean-first
+          ctest .
+
+          # Release
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="$ASAN_UBSAN_FLAGS" ..
+          cmake --build . --clean-first
+          ctest .
+
+      - name: Test with Threadsanitizer x64
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        run: |
+          # https://stackoverflow.com/a/37939589/11900641
+          function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+          if [ "${{ runner.os }}" = "Linux" ] && \
+             [ "${{ matrix.cfg.compiler }}" = "g++" ] && \
+             [ $(version ${{ matrix.cfg.compiler_version }}) -le $(version "6.0") ]; then
+            exit 0
+          fi
+
+          if [ "${{ runner.os }}" = "Linux" ] && \
+             [ "${{ matrix.cfg.compiler }}" = "clang++" ] && \
+             [ $(version ${{ matrix.cfg.compiler_version }}) -le $(version "3.9") ]; then
+            exit 0
+          fi
+
+          if [ "${{ runner.os }}" = "macOS" ] && \
+             [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
+            exit 0
+          fi
+
+          TSAN_FLAGS="-fsanitize=thread -pie -fPIE"
+          if [ "${{ runner.os }}" = "Linux" ] && [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
+            TSAN_FLAGS="$TSAN_FLAGS -static-libtsan"
+          fi
+
+          # Build and test
+          cd build
+
+          # Debug
+          cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="$TSAN_FLAGS" ..
+          cmake --build . --clean-first
+          ctest .
+
+          # Release
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="$TSAN_FLAGS" ..
+          cmake --build . --clean-first
+          ctest .
+
+      - name: Test with Memorysanitizer x64
+        if: runner.os == 'Disabled'
+        run: |
+          if [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
+            exit 0
+          fi
+
+          MSAN_FLAGS="-fsanitize=memory"
+
+          # Build and test
+          cd build
+
+          # Debug
+          cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="$MSAN_FLAGS" ..
+          cmake --build . --clean-first
+          ctest .
+
+          # Release
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="$MSAN_FLAGS" ..
+          cmake --build . --clean-first
+          ctest .
+
+      - name: Test without RTTI x64
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        run: |
+          cd build
+
+          # Debug
+          cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-fno-rtti" ..
+          cmake --build . --clean-first
+          ctest .
+
+          # Release
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-fno-rtti" ..
+          cmake --build . --clean-first
+          ctest .
+
+      - name: Test without exceptions x64
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        run: |
+          cd build
+
+          # Debug
+          cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-fno-exceptions" ..
+          cmake --build . --clean-first
+          ctest .
+
+          # Release
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-fno-exceptions" ..
+          cmake --build . --clean-first
+          ctest .

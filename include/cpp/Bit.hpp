@@ -25,7 +25,7 @@ DETAIL_CPPBASE_BEGIN_NAMESPACE
      *          of bits in Numeric - 1.
      **/
 template <typename Numeric>
-CPP_CONSTEXPR Numeric& set_bit(Numeric& numeric, Numeric bit) noexcept
+CPP_EXTENDED_CONSTEXPR Numeric& set_bit(Numeric& numeric, Numeric bit) noexcept
 {
     static_assert(std::is_unsigned<Numeric>::value,
                   "Numeric in cpp::set_bit should be an unsigned type.");
@@ -43,7 +43,7 @@ CPP_CONSTEXPR Numeric& set_bit(Numeric& numeric, Numeric bit) noexcept
      *          Numeric - 1.
      **/
 template <typename Numeric>
-CPP_CONSTEXPR Numeric& clear_bit(Numeric& numeric, Numeric bit) noexcept
+CPP_EXTENDED_CONSTEXPR Numeric& clear_bit(Numeric& numeric, Numeric bit) noexcept
 {
     static_assert(std::is_unsigned<Numeric>::value,
                   "Numeric in cpp::clear_bit should be an unsigned type.");
@@ -66,7 +66,7 @@ CPP_CONSTEXPR Numeric& clear_bit(Numeric& numeric, Numeric bit) noexcept
      * will be 1 after having executed this function.
      **/
 template <typename Numeric>
-CPP_CONSTEXPR Numeric& toggle_bit(Numeric& numeric, Numeric bit) noexcept
+CPP_EXTENDED_CONSTEXPR Numeric& toggle_bit(Numeric& numeric, Numeric bit) noexcept
 {
     static_assert(std::is_unsigned<Numeric>::value,
                   "Numeric in cpp::toggle_bit should be an unsigned type.");
@@ -115,7 +115,9 @@ inline To bit_cast(const From& from) noexcept
     static_assert(alignof(To) == alignof(From),
                   "To and From must have the same alignment requirements.");
     static_assert(std::is_trivial<To>::value, "To is not trivial!");
+#if CPP_COMPILER_IS_NOT(CPP_COMPILER_GCC) || CPP_COMPILER_VERSION_IS_ATLEAST(5, 0, 0)
     static_assert(std::is_trivially_copyable<From>::value, "From is not trivially copyable!");
+#endif
 
     std::remove_const_t<To> to;
     std::memcpy(std::addressof(to), std::addressof(from), sizeof(To));

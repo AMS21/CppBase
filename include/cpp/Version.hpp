@@ -186,7 +186,7 @@
 // __cpp_char8_t
 #ifndef __cpp_char8_t
 #    if CPP_COMPILER_IS_ATLEAST(CPP_COMPILER_GCC, 9, 0, 0) ||                                      \
-            CPP_COMPILER_IS_ATLEAST(CPP_COMPILER_CLANG, 7, 0, 0) ||                                \
+            CPP_COMPILER_IS_ATLEAST(CPP_COMPILER_CLANG, 8, 0, 0) ||                                \
             CPP_COMPILER_IS_ATLEAST(CPP_COMPILER_MSVC, 19, 22, 0)
 #        define __cpp_char8_t 201811L
 #    else
