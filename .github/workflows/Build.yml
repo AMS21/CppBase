@@ -302,6 +302,10 @@ jobs:
       - name: Test with Memorysanitizer x64
         if: runner.os == 'Linux' || runner.os == 'macOS'
         run: |
+          if [ "${{ matrix.cfg.compiler }}" = "g++" ];
+            exit 0
+          fi
+
           MSAN_FLAGS="-fsanitize=memory"
 
           # Build and test
