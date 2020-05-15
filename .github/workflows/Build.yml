@@ -36,6 +36,21 @@ jobs:
           - { os: ubuntu-latest, compiler: clang++, compiler_version: "8" }
           - { os: ubuntu-latest, compiler: clang++, compiler_version: "9" }
           - { os: ubuntu-latest, compiler: clang++, compiler_version: "10" }
+          # MacOS GCC
+          - { os: macos-latest, compiler: g++, compiler_version: 4.9 }
+          - { os: macos-latest, compiler: g++, compiler_version: 5 }
+          - { os: macos-latest, compiler: g++, compiler_version: 6 }
+          - { os: macos-latest, compiler: g++, compiler_version: 7 }
+          - { os: macos-latest, compiler: g++, compiler_version: 8 }
+          # MacOS AppleClang
+          - { os: macos-latest, compiler: clang, compiler_version: 10.3 }
+          - { os: macos-latest, compiler: clang, compiler_version: 11 }
+          - { os: macos-latest, compiler: clang, compiler_version: 11.1 }
+          - { os: macos-latest, compiler: clang, compiler_version: 11.2 }
+          - { os: macos-latest, compiler: clang, compiler_version: 11.2.1 }
+          - { os: macos-latest, compiler: clang, compiler_version: 11.3 }
+          - { os: macos-latest, compiler: clang, compiler_version: 11.4 }
+          - { os: macos-latest, compiler: clang, compiler_version: 11.4.1 }
           # Windows 2016
           - { os: windows-2016, compiler: cl }
           - { os: windows-2016, compiler: g++ }
@@ -88,6 +103,19 @@ jobs:
 
           # export compiler
           echo "::set-env name=CXX::${{ matrix.cfg.compiler }}-${{ matrix.cfg.compiler_version }}"
+
+      - name: Install (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install cmake ninja
+          if [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
+            brew install gcc@${{ matrix.cfg.version }}
+            echo "::set-env name=CXX::g++-${{ matrix.version }}"
+          else
+            ls -ls /Applications/
+            sudo xcode-select -switch /Applications/Xcode_${{ matrix.cfg.version }}.app
+            echo "::set-env name=CXX::clang++"
+          fi
 
       - name: Install (Windows)
         if: runner.os == 'Windows'
