@@ -10,7 +10,7 @@ jobs:
       CMAKE_GENERATOR: Ninja
       CTEST_OUTPUT_ON_FAILURE: ON
       CTEST_PARALLEL_LEVEL: 2
-      ASAN_OPTIONS: strict_string_checks=true:detect_odr_violation=2:detect_stack_use_after_return=true:check_initialization_order=true:strict_init_order=true:detect_leaks=1
+      ASAN_OPTIONS: strict_string_checks=true:detect_odr_violation=2:detect_stack_use_after_return=true:check_initialization_order=true:strict_init_order=true
       TSAN_OPTIONS: force_seq_cst_atomics=1
 
     strategy:
@@ -244,6 +244,11 @@ jobs:
           # against ASAN libraries causes problems when using dlopen on Ubuntu.
           if [ "${{ runner.os }}" = "Linux" ] && [ "${{ matrix.cfg.compiler }}" = "g++" ]; then
             ASAN_UBSAN_FLAGS="$ASAN_UBSAN_FLAGS -static-libasan"
+          fi
+
+          # Enable leak sanitizer on linux builds
+          if [ "${{ runnoer.os }}" = "Linux" ]; then
+            ASAN_OPTIONS=$ASAN_OPTIONS:detect_leaks=1
           fi
 
           # Build and test
