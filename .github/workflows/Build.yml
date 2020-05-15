@@ -40,12 +40,10 @@ jobs:
           - { os: windows-2016, compiler: cl }
           - { os: windows-2016, compiler: g++ }
           - { os: windows-2016, compiler: clang++ }
-          - { os: windows-2016, compiler: clang-cl }
           # Windows 2019
           - { os: windows-2019, compiler: cl }
           - { os: windows-2019, compiler: g++ }
           - { os: windows-2019, compiler: clang++ }
-          - { os: windows-2019, compiler: clang-cl }
 
     steps:
       - uses: actions/checkout@v2
