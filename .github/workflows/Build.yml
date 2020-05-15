@@ -190,8 +190,12 @@ jobs:
 
           # Debug build
           cmake -DCMAKE_BUILD_TYPE=Debug ..
-          cmake --build . --clean-first --target test_valgrind
+          cmake --build . --clean-first
+          ctest -T memcheck
+          cat ./Testing/Temporary/MemoryChecker.*.log
 
           # Release build
           cmake -DCMAKE_BUILD_TYPE=Release ..
-          cmake --build . --clean-first --target test_valgrind
+          cmake --build . --clean-first
+          ctest -T memcheck
+          cat ./Testing/Temporary/MemoryChecker.*.log
