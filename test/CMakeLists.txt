@@ -57,3 +57,9 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD ${LatestCXXStandard})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_EXTENSIONS OFF)
 
 add_test(Unittest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME})
+
+# Custom valgrind target
+add_custom_target(test_valgrind
+    COMMAND ${CMAKE_CTEST_COMMAND}
+        --force-new-ctest-process --test-action memcheck
+	COMMAND cat "${CMAKE_BINARY_DIR}/Testing/Temporary/MemoryChecker.*.log")

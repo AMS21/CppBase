@@ -21,6 +21,9 @@ endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+# Options
+option(CPPBASE_BUILD_TESTS "Whether to build to tests" ${CPPBASE_MASTER_PROJECT})
+
 # Set output directories
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -67,5 +70,7 @@ if (CPPBASE_MASTER_PROJECT)
 endif()
 
 # Tests
-enable_testing()
-add_subdirectory("test")
+if (${CPPBASE_BUILD_TESTS})
+    include(CTest)
+    add_subdirectory("test")
+endif()

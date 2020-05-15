@@ -162,6 +162,7 @@ jobs:
           cd build
           cmake ..
 
+      # Normal builds
       - name: Build & Test Debug x64
         run: |
           cd build
@@ -181,3 +182,16 @@ jobs:
           cmake --build . --clean-first
           # Run tests
           ctest .
+
+      # Memory tests
+      - name: Test With Valgrind x64
+        run: |
+          cd build
+
+          # Debug build
+          cmake -DCMAKE_BUILD_TYPE=Debug ..
+          cmake --build . --clean-first --target test_valgrind
+
+          # Release build
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . --clean-first --target test_valgrind
