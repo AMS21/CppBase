@@ -139,7 +139,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Lint changelog file
-        uses: avto-dev/markdown-lint@v1
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Lint markdown files
+        uses: prologic/action-markdownlint@v1
         with:
-          args: './README.md docs/*.md'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-check # Change reporter. (Only `github-pr-check` is supported at the moment).
