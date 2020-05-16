@@ -21,6 +21,12 @@ jobs:
 
           # Build CppCheck
           cd cppcheck
+
+          # Workaround for a bug inside cppcheck 2.0 versions.cmake
+          # TODO: Remove once 2.01 is released
+          echo Applying workaround for cppcheck 2.0
+          sed 's/"2.0"/"2.0.0"/g' cmake/versions.cmake
+
           mkdir build
           cd build
 
