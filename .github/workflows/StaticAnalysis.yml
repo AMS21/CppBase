@@ -11,7 +11,7 @@ jobs:
 
       - name: Install cppcheck
         env:
-          CPPCHECK_VERSION: "1.90"
+          CPPCHECK_VERSION: "2.0"
         run: |
           mkdir cppcheck
           wget --no-check-certificate -O - "https://github.com/danmar/cppcheck/archive/${CPPCHECK_VERSION}.tar.gz" | tar --strip-components=1 -xz -C cppcheck
