@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       llvm_version: 10
-      CXX: /usr/bin/clang++-${{ env.llvm_version) }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -52,7 +52,7 @@ jobs:
           cd build
 
           # Generate compile_commands.json
-          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER="/usr/bin/clang++-${{ env.llvm_version }}"
 
           # Run clang-tidy
           run-clang-tidy-${{ env.llvm_version }}
