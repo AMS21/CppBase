@@ -58,7 +58,7 @@ jobs:
           run-clang-tidy-${{ env.llvm_version }}
 
   flawfinder:
-    run-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
