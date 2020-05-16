@@ -68,7 +68,7 @@ jobs:
           branch: ${{ github.head_ref }}
           commit_options: '--no-verify --signoff'
           commit_user_name: Formatting Bot
-          file_pattern: docs/* examples/* include/* test/* CMakeLists.txt
+          file_pattern: docs/* include/* test/* CMakeLists.txt
 
       - name: Run misspell with reviewdog
         uses: reviewdog/action-misspell@v1.0.0
