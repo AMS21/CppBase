@@ -34,7 +34,7 @@ jobs:
 
           # Build it
           cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER="/usr/bin/g++-8" -DCMAKE_CXX_FLAGS="--coverage -g -O0" ..
-          cmake --build . --clean.first
+          cmake --build . --clean-first
 
           # Generate coverage data
           ctest .
