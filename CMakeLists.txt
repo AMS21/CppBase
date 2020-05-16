@@ -70,9 +70,7 @@ if(CPPBASE_MASTER_PROJECT)
   add_custom_target(
     ${PROJECT_NAME}_ide
     SOURCES ${CPPBASE_HEADERS}
-    COMMENT
-      "Note is only used so IDEs like MSVC can view the header only library."
-  )
+    COMMENT "Note is only used so IDEs like MSVC can view the header only library.")
 endif()
 
 # Tests
