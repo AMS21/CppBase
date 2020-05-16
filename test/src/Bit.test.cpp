@@ -6,29 +6,29 @@
 
 TEST_CASE("bits_test")
 {
-    static CPP_CONSTEXPR std::uint8_t low_bit = 0;
+    static CPP_CONSTEXPR std::uint8_t LowBit = 0;
 
-    static CPP_CONSTEXPR std::uint8_t high_bit = (sizeof(std::uint8_t) * CHAR_BIT) - 1U;
+    static CPP_CONSTEXPR std::uint8_t HighBit = (sizeof(std::uint8_t) * CHAR_BIT) - 1U;
 
     std::uint8_t val = 0;
 
-    for (std::uint8_t i = low_bit; i <= high_bit; ++i)
+    for (std::uint8_t i = LowBit; i <= HighBit; ++i)
     {
         CHECK_UNARY_FALSE(cpp::is_bit_set(val, i));
     }
 
-    CHECK_EQ(cpp::set_bit(val, low_bit), 0b0000'0001);
-    CHECK_UNARY(cpp::is_bit_set(val, low_bit));
-    CHECK_EQ(cpp::set_bit(val, low_bit), 0b0000'0001);
-    CHECK_UNARY(cpp::is_bit_set(val, low_bit));
-    CHECK_EQ(cpp::clear_bit(val, low_bit), 0b0000'0000);
-    CHECK_UNARY_FALSE(cpp::is_bit_set(val, low_bit));
-    CHECK_EQ(cpp::clear_bit(val, low_bit), 0b0000'0000);
-    CHECK_UNARY_FALSE(cpp::is_bit_set(val, low_bit));
-    CHECK_EQ(cpp::toggle_bit(val, low_bit), 0b000'0001);
-    CHECK_UNARY(cpp::is_bit_set(val, low_bit));
-    CHECK_EQ(cpp::toggle_bit(val, low_bit), 0b000'0000);
-    CHECK_UNARY_FALSE(cpp::is_bit_set(val, low_bit));
+    CHECK_EQ(cpp::set_bit(val, LowBit), 0b0000'0001);
+    CHECK_UNARY(cpp::is_bit_set(val, LowBit));
+    CHECK_EQ(cpp::set_bit(val, LowBit), 0b0000'0001);
+    CHECK_UNARY(cpp::is_bit_set(val, LowBit));
+    CHECK_EQ(cpp::clear_bit(val, LowBit), 0b0000'0000);
+    CHECK_UNARY_FALSE(cpp::is_bit_set(val, LowBit));
+    CHECK_EQ(cpp::clear_bit(val, LowBit), 0b0000'0000);
+    CHECK_UNARY_FALSE(cpp::is_bit_set(val, LowBit));
+    CHECK_EQ(cpp::toggle_bit(val, LowBit), 0b000'0001);
+    CHECK_UNARY(cpp::is_bit_set(val, LowBit));
+    CHECK_EQ(cpp::toggle_bit(val, LowBit), 0b000'0000);
+    CHECK_UNARY_FALSE(cpp::is_bit_set(val, LowBit));
 }
 
 TEST_CASE("bit_cast")

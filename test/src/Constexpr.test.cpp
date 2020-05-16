@@ -14,7 +14,7 @@ CPP_CONSTEXPR_AND_CONST int constexpr_func_2()
 
 void constexpr_func_3()
 {
-    CPP_CONSTEXPR_OR(const) int val = 42;
+    CPP_CONSTEXPR_OR(const) int Val = 42;
 }
 
 CPP_CONSTEXPR_OR_CONST int constexpr_func_4()
@@ -32,7 +32,7 @@ CPP_EXTENDED_CONSTEXPR void constexpr_func_6()
 
 void constexpr_func_7()
 {
-    CPP_EXTENDED_CONSTEXPR_OR(const) int val2 = 42;
+    CPP_EXTENDED_CONSTEXPR_OR(const) int Val2 = 42;
 }
 
 CPP_EXTENDED_CONSTEXPR_OR_CONST void constexpr_func_8()
