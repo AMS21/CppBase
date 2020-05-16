@@ -27,7 +27,7 @@ jobs:
           echo "::set-env name=PATH::$(pwd)/lcov/bin:${PATH}"
 
           # Install g++
-          sudo apt-get install g++-${{ env.GCC_VERSION }} gcov
+          sudo apt-get install g++-${{ env.GCC_VERSION }}
 
       - name: Build coverage data
         run: |
