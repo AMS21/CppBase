@@ -4,9 +4,6 @@
 
 TEST_CASE("Assume")
 {
-    int i = 42;
-    int j = 31;
-
-    CPP_ASSUME(i % 2 == 0);
-    CPP_ASSUME(j % 2 == 1);
+    CPP_ASSUME(FIRST_MAGIC_NUMBER % 2 == 0);
+    CPP_ASSUME(SECOND_MAGIC_NUMBER % 2 == 1);
 }
