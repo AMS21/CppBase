@@ -28,7 +28,7 @@ jobs:
           sudo make install
 
       - name: Run cppcheck
-        run: cppcheck test -I include --force --suppress=missingInclude --suppress=unusedFunction --suppress=unreadVariable --suppress=unusedVariable --suppress=constArgument --enable=all --inconclusive --inline-suppr --error-exitcode=1
+        run: cppcheck test -I include --force --suppress=missingInclude --suppress=unusedFunction --suppress=unreadVariable --suppress=unusedVariable --suppress=constArgument --enable=all --inconclusive --inline-suppr
 
   clang-tidy:
     runs-on: ubuntu-latest
