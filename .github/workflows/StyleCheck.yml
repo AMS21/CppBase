@@ -9,10 +9,13 @@ on:
 jobs:
   format:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        - llvm_version: 10
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.1.0
+        uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
 
@@ -22,11 +25,11 @@ jobs:
       - name: Run clang-format
         run: |
           # Install clang-format
-          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-10 main"
+          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ matrix.llvm_version }} main"
           sudo apt-get update -m
-          sudo apt-get install clang-format-10
+          sudo apt-get install clang-format-${{ matrix.llvm_version }}
 
-          clang-format-10 -i $(find -iname "*.[hc]pp" -type f)
+          clang-format-${{ matrix.llvm_version }} -i $(find -iname "*.[hc]pp" -type f)
 
       - name: Run cmake-format
         run: |
@@ -50,7 +53,7 @@ jobs:
       - name: Clang-tidy naming
         run: |
           # Install clang-tidy
-          sudo apt-get install clang-tidy-10
+          sudo apt-get install clang-tidy-${{ matrix.llvm_version }}
 
           # Create build directory
           mkdir build
@@ -60,7 +63,7 @@ jobs:
           cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
           # Run clang-tidy
-          run-clang-tidy-10 -checks="-*,readability-identifier-naming" -fix
+          run-clang-tidy-${{ matrix.llvm_version }} -checks="-*,readability-identifier-naming" -fix
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4.2.0
