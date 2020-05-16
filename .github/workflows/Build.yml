@@ -63,11 +63,12 @@ jobs:
           #- { os: windows-2019, compiler: clang++ }
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
       # Installs
       - name: get-cmake
-        uses: lukka/get-cmake@latest
+        uses: lukka/get-cmake@3.17.2
 
       - name: Install (Linux)
         if: runner.os == 'Linux'
