@@ -1,0 +1,60 @@
+name: StaticAnalysis
+
+on: [push, pull_request]
+
+jobs:
+  cppcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install cppcheck
+        env:
+          CPPCHECK_VERSION="1.90"
+        run: |
+          mkdir cppcheck
+          wget --no-check-certificate -O - "https://github.com/danmar/cppcheck/archive/${CPPCHECK_VERSION}.tar.gz" | tar --strip-components=1 -xz -C cppcheck
+
+          # Build CppCheck
+          cd cppcheck
+          mkdir build
+          cd build
+
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake --build . -j2
+
+          # Install CppCheck
+          sudo make install
+
+      - name: Run cppcheck
+        run: cppcheck test -I include --force --suppress=missingInclude --suppress=unusedFunction --suppress=unreadVariable --suppress=unusedVariable --suppress=constArgument --enable=all --inconclusive --inline-suppr --error-exitcode=1
+
+  clang-tidy:
+    strategy:
+      matrix:
+        - llvm_version: 10
+    runs-on: ubuntu-latest
+    env:
+      CXX: /usr/bin/clang++-${{ matrix.llvm_version) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install clang tidy
+        run: |
+          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ matrix.llvm_version }} main"
+          sudo apt-get update -m
+          sudo apt-get install clang-${{ matrix.llvm_version }} clang-tidy-${{ matrix.llvm_version }}
+
+      - name: Run clang-tidy
+        run: |
+          # Create build directory
+          mkdir build
+          cd build
+
+          # Generate compile_commands.json
+          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+          # Run clang-tidy
+          run-clang-tidy-${{ matrix.llvm_version }}
