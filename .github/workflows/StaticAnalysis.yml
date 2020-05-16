@@ -141,9 +141,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        
+
       - name: Lint markdown files
-        uses: prologic/action-markdownlint@v1
+        uses: prologic/action-markdownlint@v0.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-check # Change reporter. (Only `github-pr-check` is supported at the moment).
