@@ -31,11 +31,9 @@ jobs:
         run: cppcheck test -I include --force --suppress=missingInclude --suppress=unusedFunction --suppress=unreadVariable --suppress=unusedVariable --suppress=constArgument --enable=all --inconclusive --inline-suppr --error-exitcode=1
 
   clang-tidy:
-    env:
-      llvm_version: 10
-
     runs-on: ubuntu-latest
     env:
+      llvm_version: 10
       CXX: /usr/bin/clang++-${{ env.llvm_version) }}
     steps:
       - name: Checkout
