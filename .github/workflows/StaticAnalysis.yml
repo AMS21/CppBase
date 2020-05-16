@@ -127,11 +127,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install clang
+      - name: Install llvm
         run: |
           sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ env.llvm_version }} main"
           sudo apt-get update -m
-          sudo apt-get install clang-${{ env.llvm_version }}
+          sudo apt-get install clang-${{ env.llvm_version }} llvm-${{ env.llvm_version }}
 
       - name: Install Include-What-You-Use
         run: |
