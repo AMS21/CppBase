@@ -117,3 +117,20 @@ jobs:
 
           # Display warnings
           cat PVS-Studio.err
+
+  cmake-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install cmake-lint
+        run: |
+          sudo apt-get install python3
+          sudo pip install --upgrade pip
+          sudo pip install cmake-format
+
+      - name: Run cmake-lint
+        run: |
+          cmake-lint $(find -iregex "./.*\.cmake" -or -iregex "./.*\CMakeLists\.txt") -c ".cmake-format.yaml"
