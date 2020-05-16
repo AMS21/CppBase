@@ -9,6 +9,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Install cmake
+        uses: lukka/get-cmake@v3.17.2
+
       - name: Install cppcheck
         env:
           CPPCHECK_VERSION: "2.0"
