@@ -31,21 +31,21 @@ jobs:
         run: cppcheck test -I include --force --suppress=missingInclude --suppress=unusedFunction --suppress=unreadVariable --suppress=unusedVariable --suppress=constArgument --enable=all --inconclusive --inline-suppr --error-exitcode=1
 
   clang-tidy:
-    strategy:
-      matrix:
-        llvm_version: 10
+    env:
+      llvm_version: 10
+
     runs-on: ubuntu-latest
     env:
-      CXX: /usr/bin/clang++-${{ matrix.llvm_version) }}
+      CXX: /usr/bin/clang++-${{ env.llvm_version) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Install clang tidy
         run: |
-          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ matrix.llvm_version }} main"
+          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ env.llvm_version }} main"
           sudo apt-get update -m
-          sudo apt-get install clang-${{ matrix.llvm_version }} clang-tidy-${{ matrix.llvm_version }}
+          sudo apt-get install clang-${{ env.llvm_version }} clang-tidy-${{ env.llvm_version }}
 
       - name: Run clang-tidy
         run: |
@@ -57,4 +57,4 @@ jobs:
           cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
           # Run clang-tidy
-          run-clang-tidy-${{ matrix.llvm_version }}
+          run-clang-tidy-${{ env.llvm_version }}
