@@ -1,0 +1,203 @@
+name: StaticAnalysis
+
+on: [push, pull_request]
+
+jobs:
+  cppcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install cmake
+        uses: lukka/get-cmake@v3.17.2
+
+      - name: Install cppcheck
+        env:
+          CPPCHECK_VERSION: "2.0"
+        run: |
+          mkdir cppcheck
+          wget --no-check-certificate -O - "https://github.com/danmar/cppcheck/archive/${CPPCHECK_VERSION}.tar.gz" | tar --strip-components=1 -xz -C cppcheck
+
+          # Build CppCheck
+          cd cppcheck
+
+          # Workaround for a bug inside cppcheck 2.0 versions.cmake
+          # TODO: Remove once 2.01 is released
+          echo Applying workaround for cppcheck 2.0
+          sed --in-place 's/"2.0"/"2.0.0"/g' cmake/versions.cmake
+
+          mkdir build
+          cd build
+
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake --build . -j2
+
+          # Install CppCheck
+          sudo make install
+
+      - name: Run cppcheck
+        run: cppcheck test -I include --force --suppress=missingInclude --suppress=unusedFunction --suppress=unreadVariable --suppress=unusedVariable --suppress=constArgument --enable=all --inconclusive --inline-suppr
+
+  clang-tidy:
+    runs-on: ubuntu-latest
+    env:
+      llvm_version: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install clang tidy
+        run: |
+          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ env.llvm_version }} main"
+          sudo apt-get update -m
+          sudo apt-get install clang-${{ env.llvm_version }} clang-tidy-${{ env.llvm_version }}
+
+      - name: Run clang-tidy
+        run: |
+          # Create build directory
+          mkdir build
+          cd build
+
+          # Generate compile_commands.json
+          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER="/usr/bin/clang++-${{ env.llvm_version }}"
+
+          # Run clang-tidy
+          run-clang-tidy-${{ env.llvm_version }}
+
+  flawfinder:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install flawfinder
+        run: |
+          sudo apt-get install python3
+          sudo pip install --upgrade pip
+          sudo pip install flawfinder
+
+      - name: Run flawfinder
+        run: |
+          flawfinder test/src include
+
+  pvs-studio:
+    runs-on: ubuntu-latest
+    env:
+      llvm_version: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install clang
+        run: |
+          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ env.llvm_version }} main"
+          sudo apt-get update -m
+          sudo apt-get install clang-${{ env.llvm_version }} clang-tidy-${{ env.llvm_version }}
+
+      - name: Install PVS-Studio
+        run: |
+          wget -q -O - https://files.viva64.com/etc/pubkey.txt | sudo apt-key add
+          sudo wget -O /etc/apt/sources.list.d/viva64.list https://files.viva64.com/etc/viva64.list
+
+          sudo apt-get update -qq
+          sudo apt-get install -qq pvs-studio
+
+      - name: Run PVS-Studio
+        run: |
+          # Create build
+          mkdir build
+          cd build
+
+          # Configure
+          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER="/usr/bin/clang++-${{ env.llvm_version }}"
+
+          # Create License
+          pvs-studio-analyzer credentials ${{ secrets.PVS_USERNAME }} ${{ secrets.PVS_KEY }} -o PVS-Studio.lic
+
+          # Run analysis
+          pvs-studio-analyzer analyze --threads 2 --lic-file PVS-Studio.lic --output-file PVS-Studio.log --exclude-path ../test/include
+
+          # Convert to readable format
+          plog-converter --renderTypes errorfile PVS-Studio.log --output PVS-Studio.err
+
+          # Display warnings
+          cat PVS-Studio.err
+
+  include-what-you-use:
+    runs-on: ubuntu-latest
+    env:
+      llvm_version: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install llvm
+        run: |
+          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ env.llvm_version }} main"
+          sudo apt-get update -m
+          sudo apt-get install clang-${{ env.llvm_version }} llvm-${{ env.llvm_version }} llvm-${{ env.llvm_version }}-dev libclang-${{ env.llvm_version }}-dev
+
+      - name: Install Include-What-You-Use
+        run: |
+          # Download Include-what-you-use
+          git clone https://github.com/include-what-you-use/include-what-you-use.git
+          cd "include-what-you-use"
+
+          # Checkout branch
+          git checkout clang_${{ env.llvm_version }}
+
+          # Build Include-what-you-use
+          mkdir build
+          cd build
+
+          cmake .. -G "Unix Makefiles" -DCMAKE_C_COMPILER="/usr/bin/clang-${{ env.llvm_version }}" -DCMAKE_CXX_COMPILER="/usr/bin/clang++-${{ env.llvm_version }}" -DCMAKE_PREFIX_PATH=/usr/lib/llvm-${{ env.llvm_version }} -DCMAKE_BUILD_TYPE=Release
+          cmake --build .
+
+          # Install Include-what-you-use
+          sudo make install
+
+      - name: Run Include-What-You-Use
+        run: |
+          # Create build directory
+          mkdir build
+          cd build
+
+          # Configure
+          cmake -DCMAKE_CXX_COMPILER="/usr/bin/clang++-${{ env.llvm_version }}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+
+          iwyu_tool.py -p .
+
+  cmake-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install cmake-lint
+        run: |
+          sudo apt-get install python3
+          sudo pip install --upgrade pip
+          sudo pip install cmake-format
+
+      - name: Run cmake-lint
+        run: |
+          cmake-lint $(find -iregex "./.*\.cmake" -or -iregex "./.*\CMakeLists\.txt") -c ".cmake-format.yaml"
+
+  markdown-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Lint markdown files
+        uses: prologic/action-markdownlint@v0.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-check # Change reporter. (Only `github-pr-check` is supported at the moment).

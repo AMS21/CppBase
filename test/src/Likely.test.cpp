@@ -11,8 +11,8 @@ TEST_CASE("Likely")
         CHECK_UNARY(true);
     }
 
-    if (CPP_UNLIKELY(i % 2) == 0)
+    if (CPP_UNLIKELY(i % 2) == 1)
     {
-        CHECK_UNARY(false);
+        CHECK_UNARY(true);
     }
 }
