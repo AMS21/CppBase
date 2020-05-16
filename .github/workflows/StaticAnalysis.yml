@@ -118,6 +118,51 @@ jobs:
           # Display warnings
           cat PVS-Studio.err
 
+  include-what-you-use:
+    runs-on: ubuntu-latest
+    env:
+      llvm_version: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install clang
+        run: |
+          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ env.llvm_version }} main"
+          sudo apt-get update -m
+          sudo apt-get install clang-${{ env.llvm_version }}
+
+      - name: Install Include-What-You-Use
+        run: |
+          # Download Include-what-you-use
+          git clone https://github.com/include-what-you-use/include-what-you-use.git
+          cd "include-what-you-use"
+
+          # Checkout branch
+          git checkout clang_${{ env.llvm_version }}
+
+          # Build Include-what-you-use
+          mkdir build
+          cd build
+
+          cmake .. -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=/usr/lib/llvm-${{ env.llvm_version }} -DCMAKE_BUILD_TYPE=Release
+          cmake --build .
+
+          # Install Include-what-you-use
+          sudo make install
+
+      - name: Run Include-What-You-Use
+        run: |
+          # Create build directory
+          mkdir build
+          cd build
+
+          # Configure
+          cmake -DCMAKE_CXX_COMPILER="/usr/bin/clang++-${{ env.llvm_version }}" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+
+          iwyu_tool.py -p .
+
   cmake-lint:
     runs-on: ubuntu-latest
 
