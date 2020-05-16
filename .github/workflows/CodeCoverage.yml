@@ -19,7 +19,7 @@ jobs:
           mkdir lcov
           wget --no-check-certificate -O - "https://github.com/linux-test-project/lcov/releases/download/v1.14/lcov-1.14.tar.gz" | tar --strip-components=1 -xz -C lcov
           cd lcov
-          make install
+          sudo make install
 
           echo "::set-env name=PATH::$(pwd)/lcov/bin:${PATH}"
 
