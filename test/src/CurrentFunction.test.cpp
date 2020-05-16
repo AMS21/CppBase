@@ -4,5 +4,5 @@
 
 TEST_CASE("CurrentFunction")
 {
-    const char* func_name = CPP_CURRENT_FUNCTION;
+    const char func_name[] = CPP_CURRENT_FUNCTION;
 }
