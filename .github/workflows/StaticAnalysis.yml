@@ -33,7 +33,7 @@ jobs:
   clang-tidy:
     strategy:
       matrix:
-        - llvm_version: 10
+        llvm_version: 10
     runs-on: ubuntu-latest
     env:
       CXX: /usr/bin/clang++-${{ matrix.llvm_version) }}

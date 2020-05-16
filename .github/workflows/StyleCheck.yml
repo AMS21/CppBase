@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        - llvm_version: 10
+        llvm_version: 10
 
     steps:
       - name: Checkout
