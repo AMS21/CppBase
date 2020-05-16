@@ -67,7 +67,7 @@ target_include_directories(
 
 if(CPPBASE_MASTER_PROJECT)
   # Hack for IDE's like MSVC see https://stackoverflow.com/a/29214327
-  add_custom_target(${PROJECT_NAME}_ide SOURCES ${CPPBASE_HEADERS})
+  add_custom_target(${PROJECT_NAME}_ide SOURCES ${CPPBASE_HEADERS} COMMENT "Note build project should not be build and is only used so IDEs like MSVC can view a header only library.")
 endif()
 
 # Tests
