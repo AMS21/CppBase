@@ -73,3 +73,47 @@ jobs:
       - name: Run flawfinder
         run: |
           flawfinder test/src include
+
+  pvs-studio:
+    runs-on: ubuntu-latest
+    env:
+      llvm_version: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install clang
+        run: |
+          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ env.llvm_version }} main"
+          sudo apt-get update -m
+          sudo apt-get install clang-${{ env.llvm_version }} clang-tidy-${{ env.llvm_version }}
+
+      - name: Install PVS-Studio
+        run: |
+          wget -q -O - https://files.viva64.com/etc/pubkey.txt | sudo apt-key add
+          sudo wget -O /etc/apt/sources.list.d/viva64.list https://files.viva64.com/etc/viva64.list
+
+          sudo apt-get update -qq
+          sudo apt-get install -qq pvs-studio
+
+      - name: Run PVS-Studio
+        run: |
+          # Create build
+          mkdir build
+          cd build
+
+          # Configure
+          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER="/usr/bin/clang++-${{ env.llvm_version }}"
+
+          # Create License
+          pvs-studio-analyzer credentials ${{ secrets.PVS_USERNAME }} ${{ secrets.PVS_KEY }} -o PVS-Studio.lic
+
+          # Run analysis
+          pvs-studio-analyzer analyze --threads 2 --lic-file PVS-Studio.lic --output-file PVS-Studio.log --disableLicenseExpirationCheck --exclude-path ../test/include
+
+          # Convert to readable format
+          plog-converter --renderTypes errorfile PVS-Studio.log --output PVS-Studio.err
+
+          # Display warnings
+          cat PVS-Studio.err
