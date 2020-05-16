@@ -131,7 +131,7 @@ jobs:
         run: |
           sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ env.llvm_version }} main"
           sudo apt-get update -m
-          sudo apt-get install clang-${{ env.llvm_version }} llvm-${{ env.llvm_version }}
+          sudo apt-get install clang-${{ env.llvm_version }} llvm-${{ env.llvm_version }} llvm-${{ env.llvm_version }}-dev libclang-${{ env.llvm_version }}-dev
 
       - name: Install Include-What-You-Use
         run: |
