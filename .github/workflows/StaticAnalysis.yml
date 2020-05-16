@@ -134,3 +134,12 @@ jobs:
       - name: Run cmake-lint
         run: |
           cmake-lint $(find -iregex "./.*\.cmake" -or -iregex "./.*\CMakeLists\.txt") -c ".cmake-format.yaml"
+
+  markdown-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Lint changelog file
+        uses: avto-dev/markdown-lint@v1
+        with:
+          args: '*.md'
