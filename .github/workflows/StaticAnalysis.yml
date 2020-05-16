@@ -56,3 +56,20 @@ jobs:
 
           # Run clang-tidy
           run-clang-tidy-${{ env.llvm_version }}
+
+  flawfinder:
+    run-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install flawfinder
+        run: |
+          sudo apt-get install python3
+          sudo pip install --upgrade pip
+          sudo pip install flawfinder
+
+      - name: Run flawfinder
+        run: |
+          flawfinder test/src include
