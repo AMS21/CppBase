@@ -6,8 +6,8 @@ jobs:
   code_coverage:
     runs-on: ubuntu-latest
     env:
-      - LCOV_VERSION: "1.14"
-        GCC_VERSION: "8"
+      LCOV_VERSION: "1.14"
+      GCC_VERSION: "8"
 
     steps:
       - name: Checkout
