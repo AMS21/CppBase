@@ -71,7 +71,7 @@ if(CPPBASE_MASTER_PROJECT)
     ${PROJECT_NAME}_ide
     SOURCES ${CPPBASE_HEADERS}
     COMMENT
-      "Note build project should not be build and is only used so IDEs like MSVC can view a header only library."
+      "Note is only used so IDEs like MSVC can view the header only library."
   )
 endif()
 
