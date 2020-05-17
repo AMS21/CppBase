@@ -344,6 +344,7 @@ jobs:
           ctest .
 
       - name: Test without exceptions x64
+        shell: bash
         run: |
           if [ "${{ matrix.cfg.compiler }}" = "cl" ]; then
             NO_EXCEPTION_FLAG="/gr-"
