@@ -75,7 +75,7 @@ if (NOT CPP_ENABLE_EXCEPTIONS)
     # TODO: Disable exceptions on MSVC
     target_compile_options(${PROJECT_NAME} INTERFACE "")
   else()
-    target_compile_definitions(${PROJECT_NAME} INTERFACE "-fno-exceptions")
+    target_compile_options(${PROJECT_NAME} INTERFACE "-fno-exceptions")
   endif()
 endif()
 
