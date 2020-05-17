@@ -72,8 +72,7 @@ target_include_directories(
 # Cpp options
 if (NOT CPP_ENABLE_EXCEPTIONS)
   if (MSVC)
-    # TODO: Disable exceptions on MSVC
-    target_compile_options(${PROJECT_NAME} INTERFACE "")
+    string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
   else()
     target_compile_options(${PROJECT_NAME} INTERFACE "-fno-exceptions")
   endif()
