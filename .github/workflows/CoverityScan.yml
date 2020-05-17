@@ -1,16 +1,17 @@
-name: coverity-scan
+name: CoverityScan
 on:
-  push:
-#  schedule:
-#    - cron: '0 18 * * *' # Daily at 18:00 UTC
+  schedule:
+    - cron: '0 9 * * *' # Daily at 9:00 UTC
 
 jobs:
-  latest:
+  trunk:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: 'develop'
 
       - name: get-cmake
         uses: lukka/get-cmake@v3.17.2
