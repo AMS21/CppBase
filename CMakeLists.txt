@@ -24,6 +24,10 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Options
 option(CPPBASE_BUILD_TESTS "Whether to build to tests" ${CPPBASE_MASTER_PROJECT})
 
+# Cpp Options
+option(CPP_ENABLE_EXCEPTIONS "Enable C++ exceptions" ON)
+option(CPP_ENABLE_RTTI "Enable C++ Run time type identification (RTTI)" ON)
+
 # Set output directories
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -64,6 +68,24 @@ target_include_directories(
   ${PROJECT_NAME} INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                             "$<INSTALL_INTERFACE:include>" # <prefix>/include
 )
+
+# Cpp options
+if (NOT CPP_ENABLE_EXCEPTIONS)
+  if (MSVC)
+    # TODO: Disable exceptions on MSVC
+    target_compile_options(${PROJECT_NAME} INTERFACE "")
+  else()
+    target_compile_definitions(${PROJECT_NAME} INTERFACE "-fno-exceptions")
+  endif()
+endif()
+
+if (NOT CPP_ENABLE_RTTI)
+  if (MSVC)
+    target_compile_options(${PROJECT_NAME} INTERFACE "/gr-")
+  else()
+    target_compile_options(${PROJECT_NAME} INTERFACE "-fno-rtti")
+  endif()
+endif()
 
 if(CPPBASE_MASTER_PROJECT)
   # Hack for IDE's like MSVC see https://stackoverflow.com/a/29214327
