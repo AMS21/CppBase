@@ -46,7 +46,8 @@
 #    endif
 
 // likely & unlikely (https://wg21.link/P0479R5)
-#    if CPP_COMPILER_IS_ATLEAST(CPP_COMPILER_GCC, 9, 0, 0)
+#    if CPP_COMPILER_IS_ATLEAST(CPP_COMPILER_GCC, 9, 0, 0) ||                                      \
+            CPP_COMPILER_IS_ATLEAST(CPP_COMPILER_MSVC, 19, 26, 0)
 #        define DETAIL_CPP_ATTRIBUTE_likely 201803L
 #        define DETAIL_CPP_ATTRIBUTE_unlikely 201803L
 #    else
