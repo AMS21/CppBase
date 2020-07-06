@@ -18,8 +18,7 @@ TEST_CASE("Likely")
 
     switch (i)
     {
-        CPP_UNLIKELY_CASE case 3 : CHECK_UNARY(false);
-        break;
+        CPP_UNLIKELY_CASE case 3 : break;
         CPP_LIKELY_CASE case 5 : CHECK_UNARY(true);
         break;
     }
