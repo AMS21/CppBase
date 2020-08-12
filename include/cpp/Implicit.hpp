@@ -9,6 +9,6 @@
  * \def CPP_IMPLICIT
  * \brief Declares a constructor to be implicit.
 **/
-#define CPP_IMPLICIT /* cppcheck-suppress noExplicitConstructor */
+#define CPP_IMPLICIT /* NOLINT(google-explicit-constructor, hicpp-explicit-conversions) */
 
 #endif // INCG_CPPBASE_IMPLICIT_HPP
