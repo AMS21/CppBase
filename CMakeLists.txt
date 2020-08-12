@@ -44,6 +44,7 @@ file(
   "include/cpp/Debug.hpp"
   "include/cpp/FunctionLikeMacro.hpp"
   "include/cpp/Glue.hpp"
+  "include/cpp/Implicit.hpp"
   "include/cpp/Inline.hpp"
   "include/cpp/Likely.hpp"
   "include/cpp/NonCopyable.hpp"

@@ -29,6 +29,7 @@ file(
   "src/CurrentFunction.test.cpp"
   "src/FunctionLikeMacro.test.cpp"
   "src/Glue.test.cpp"
+  "src/Implicit.test.cpp"
   "src/Inline.test.cpp"
   "src/Likely.test.cpp"
   "src/NonCopyable.test.cpp"
