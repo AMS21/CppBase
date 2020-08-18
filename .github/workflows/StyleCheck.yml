@@ -74,7 +74,7 @@ jobs:
           file_pattern: docs/* include/* test/* CMakeLists.txt
 
       - name: Run misspell with reviewdog
-        uses: reviewdog/action-misspell@v1.0.0
+        uses: reviewdog/action-misspell@v1.5
         with:
           github_token: ${{ github.token }}
           # -locale flag of misspell. (US/UK)
