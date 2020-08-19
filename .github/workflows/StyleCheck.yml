@@ -19,7 +19,7 @@ jobs:
           ref: ${{ github.head_ref }}
 
       - name: Install cmake
-        uses: lukka/get-cmake@v3.17.2
+        uses: lukka/get-cmake@v3.18.0
 
       - name: Run clang-format
         run: |
