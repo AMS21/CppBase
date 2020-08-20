@@ -159,7 +159,7 @@
  * \param minor Minor version to compare against CPP_COMPILER_MINOR
  * \param patch Patch version to compare against CPP_COMPILER_PATCH
  * \note This doesn't check the compiler only the version
- * \sa CPP_COMPILER_VERSION_IS_BELOW, CPP_COMPILER_IS_ATLEAST, CPP_COMPILER_IS_BELOW, 
+ * \sa CPP_COMPILER_VERSION_IS_BELOW, CPP_COMPILER_IS_ATLEAST, CPP_COMPILER_IS_BELOW,
  *     CPP_COMPILER_VERSION, CPP_COMPILER_MAJOR, CPP_COMPILER_MINOR, CPP_COMPILER_PATCH
 **/
 #define CPP_COMPILER_VERSION_IS_ATLEAST(major, minor, patch)                                       \
