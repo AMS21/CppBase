@@ -1,22 +1,19 @@
 name: StyleCheck
 
-on:
-  pull_request:
-  push:
-    branches:
-      - master
+on: pull_request
 
 jobs:
   format:
     runs-on: ubuntu-latest
     env:
-      llvm_version: 10
+      LLVM_VERSION: 10
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
+          token: ${{ secrets.PAT }}
 
       - name: Install cmake
         uses: lukka/get-cmake@v3.18.0
@@ -24,18 +21,19 @@ jobs:
       - name: Run clang-format
         run: |
           # Install clang-format
-          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ env.llvm_version }} main"
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-${{ env.LLVM_VERSION }} main"
           sudo apt-get update -m
-          sudo apt-get install clang-format-${{ env.llvm_version }}
+          sudo apt-get install clang-format-${{ env.LLVM_VERSION }}
 
-          clang-format-${{ env.llvm_version }} -i $(find -iname "*.[hc]pp" -type f)
+          clang-format-${{ env.LLVM_VERSION }} -i $(find -iname "*.[hc]pp" -type f)
 
       - name: Run cmake-format
         run: |
           # Install cmake-format
           sudo apt-get install python3
-          sudo pip install --upgrade pip
-          sudo pip install cmake-format
+          sudo -H pip3 install --upgrade pip
+          sudo -H pip3 install cmake-format
 
           cmake-format -c ".cmake-format.yaml" -i $(find -iregex "./.*\.cmake" -or -iregex "./.*\CMakeLists\.txt")
 
@@ -45,14 +43,27 @@ jobs:
           sudo apt-get install moreutils
 
           # Fix mixed tabs and spaces
-          find ./ -iname '*.[hc]pp]' -type f -exec bash -c 'expand -t 4 "$0" | sponge "$0"' {} \;
+          find . -iregex '.*\.\(hpp\|cpp\|yaml\|yml\|md\|txt\|cmake\)' -type f -exec bash -c 'expand -t 4 "$0" | sponge "$0"' {} \;
           # Fix trailing white spaces
-          find ./ -iname '*.[hc]pp]' -type f -exec bash -c 'sed -i 's/[[:space:]]*$//' "$0" | sponge "$0"' {} \;
+          find . -iregex '.*\.\(hpp\|cpp\|yaml\|yml\|md\|txt\|cmake\)' -type f -exec bash -c 'sed -i '' -e's/[[:space:]]*$//' "$0"' {} \;
+          # Ensure files end with new line
+          find . -iregex '.*\.\(hpp\|cpp\|yaml\|yml\|md\|txt\|cmake\)' -type f -exec bash -c 'tail -c1 < "$0" | read -r _ || echo >> "$0"' {} \;
 
-      - name: Clang-tidy naming
+      - name: Fix encoding
+        run: |
+          # Install 'dos2unix' and 'recode'
+          sudo apt-get install dos2unix recode
+
+          # Ensure that files are UTF-8 formatted
+          find . -iregex '.*\.\(hpp\|cpp\|yaml\|yml\|md\|txt\|cmake\)' -type f -exec bash -c 'recode UTF-8 "$0" 2> /dev/null' {} \;
+          # Ensure that files have LF line endings and do not contain a BOM.
+          find . -iregex '.*\.\(hpp\|cpp\|yaml\|yml\|md\|txt\|cmake\)' -type f -exec bash -c 'dos2unix "$0" 2> /dev/null' {} \;
+
+      - name: Clang-tidy fixes
         run: |
           # Install clang-tidy
-          sudo apt-get install clang-tidy-${{ env.llvm_version }}
+          sudo apt-get install clang-tidy-${{ env.LLVM_VERSION }} clang-${{ env.LLVM_VERSION }}
+          export CXX="clang++-${{ env.LLVM_VERSION }}"
 
           # Create build directory
           mkdir build
@@ -62,22 +73,117 @@ jobs:
           cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
           # Run clang-tidy
-          run-clang-tidy-${{ env.llvm_version }} -checks="-*,readability-identifier-naming" -fix
+          run-clang-tidy-${{ env.LLVM_VERSION }} -fix -header-filter ".*" -checks="-*,bugprone-argument-comment,bugprone-reserved-identifier,cppcoreguidelines-pro-type-cstyle-cast,modernize-deprecated-headers,modernize-make-shared,modernize-make-unique,modernize-pass-by-value,modernize-raw-string-literal,modernize-redundant-void-arg,modernize-use-equals-default,modernize-use-equals-delete,modernize-use-nodiscard,modernize-use-nullptr,modernize-use-override,modernize-use-using,readability-braces-around-statements,readability-container-size-empty,readability-identifier-naming,readability-inconsistent-declaration-parameter-name,readability-isolate-declaration,readability-make-member-function-const,readability-qualified-auto,readability-redundant-control-flow,readability-simplify-boolean-expr"
+
+      - name: Build
+        run: |
+          # The applied fixes might break the code so make sure it still compiles
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Debug
+          cmake --build . --clean-first
+          ctest .
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v2
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.BOT_PRIVATE_KEY }}
+          PASSPHRASE: ${{ secrets.BOT_KEY_PASSPHRASE }}
+        with:
+          git_user_signingkey: true
+          git_commit_gpgsign: true
 
       - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4.4.1
+        uses: stefanzweifel/git-auto-commit-action@v4
+        continue-on-error: true  # Ignore errors
         with:
-          commit_message: Applied automatic formatting
+          commit_message: Applied automatic formatting and fixes
           branch: ${{ github.head_ref }}
-          commit_options: '--no-verify --signoff'
-          commit_user_name: Formatting Bot
-          file_pattern: docs/* include/* test/* CMakeLists.txt
+          commit_options: '-S --no-verify --signoff'
+          commit_user_name: CppBase Code Quality Bot
+          commit_user_email: AMS21Bot.github@gmail.com
+          commit_author: AMS21Bot <AMS21Bot.github@gmail.com>
+          file_pattern: .github/* docs/* include/* test/* .cmake-format.yaml CMakeLists.txt README.md
+
+  misspell:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Run misspell with reviewdog
-        uses: reviewdog/action-misspell@v1.5
+        uses: reviewdog/action-misspell@v1
         with:
-          github_token: ${{ github.token }}
-          # -locale flag of misspell. (US/UK)
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           locale: US
-          # Report level for reviewdog [info,warning,error]
-          level: error
+          reporter: github-pr-review
+          level: warning
+
+  yamllint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: yamllint
+        uses: reviewdog/action-yamllint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          yamllint_flags: '-d "{extends: relaxed, rules: {line-length: {max: 100}}}"'
+          level: warning
+
+  markdownlint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: markdownlint
+        uses: prologic/action-markdownlint@v0.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-check # Change reporter. (Only `github-pr-check` is supported at the moment).
+          level: warning
+
+  remark-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: remark-lint
+        uses: prologic/action-remark-lint@v0.0.5
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-check # Change reporter. (Only `github-pr-check` is supported at the moment).
+          level: warning
+
+  languagetool:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: reviewdog/action-languagetool@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          level: warning
+
+  alex:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: reviewdog/action-alex@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          level: warning
