@@ -179,11 +179,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - uses: actions/setup-python@v2.1.2
+        with:
+          python-version: '3.x'
+
       - name: Install cmake-lint
         run: |
-          sudo apt-get install python3
-          sudo pip install --upgrade pip
-          sudo pip install cmake-format
+          sudo -H pip3 install --upgrade pip
+          sudo -H pip3 install cmake-format
 
       - name: Run cmake-lint
         run: |
