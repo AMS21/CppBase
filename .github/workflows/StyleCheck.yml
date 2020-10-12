@@ -23,7 +23,7 @@ jobs:
           python-version: '3.x'
 
       - name: Install cmake
-        uses: lukka/get-cmake@v3.18.0
+        uses: lukka/get-cmake@v3.18.3
 
       - name: Run clang-format
         run: |
