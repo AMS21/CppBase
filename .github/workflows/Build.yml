@@ -72,7 +72,7 @@ jobs:
 
       # Installs
       - name: get-cmake
-        uses: lukka/get-cmake@v3.18.3
+        uses: lukka/get-cmake@v3.19.0
 
       - name: Install (Linux)
         if: runner.os == 'Linux'
